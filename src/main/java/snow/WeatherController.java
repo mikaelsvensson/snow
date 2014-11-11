@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class WeatherController {
+    private static final int SNOW_FLAKE_COUNT = 100;
     private static WeatherController instance;
+    private static final long MINIMUM_SECONDS_FOR_FALL = 5;
 
     public static interface Listener {
         void onSnowFlakeChange();
@@ -32,38 +34,10 @@ public class WeatherController {
 
     public void start() {
         stop();
-        for (int i = 0; i < 100; i++) {
-            SnowFlake snowFlake = new SnowFlake(snowflakeWidth, snowflakeHeight);
-            snowFlake.y = -snowFlake.radius;// * 100;
-            snowFlakes.add(snowFlake);
+        for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
+            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight));
         }
-        Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                long lastTime = System.currentTimeMillis();
-                long secondsToFall = 5;
-                while (!Thread.currentThread().isInterrupted()) {
-                    long now = System.currentTimeMillis();
-                    long delay = now - lastTime;
-                    lastTime = now;
-                    for (SnowFlake snowFlake : snowFlakes) {
-                        double changePerMillisecond = snowFlake.speed / secondsToFall / 1000;
-                        double delta = delay * changePerMillisecond;
-                        if (snowFlake.y + delta > 1.0) {
-                            snowFlake.reset();
-                        } else {
-                            snowFlake.y += delta;
-                            double degreesPerMillisecond = snowFlake.speed * (360.0 / secondsToFall / 1000);
-                            snowFlake.rotation = (snowFlake.rotation + (degreesPerMillisecond * delay)) % 360;
-                        }
-                    }
-                    fireListeners();
-                    Thread.yield();
-                }
-            }
-        };
-        thread = new Thread(runnable);
+        thread = new Thread(new SnowFlakeMoverRunnable());
         thread.start();
     }
 
@@ -92,5 +66,31 @@ public class WeatherController {
             }
         }
         return instance;
+    }
+
+    private class SnowFlakeMoverRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            long lastTime = System.currentTimeMillis();
+            while (!Thread.currentThread().isInterrupted()) {
+                long now = System.currentTimeMillis();
+                long delay = now - lastTime;
+                lastTime = now;
+                for (SnowFlake snowFlake : snowFlakes) {
+                    double changePerMillisecond = snowFlake.speed / MINIMUM_SECONDS_FOR_FALL / 1000;
+                    double delta = delay * changePerMillisecond;
+                    if (snowFlake.y + delta > 1.0) {
+                        snowFlake.reset();
+                    } else {
+                        snowFlake.y += delta;
+                        double degreesPerMillisecond = snowFlake.speed * (360.0 / MINIMUM_SECONDS_FOR_FALL / 1000);
+                        snowFlake.rotation = (snowFlake.rotation + (degreesPerMillisecond * delay)) % 360;
+                    }
+                }
+                fireListeners();
+                Thread.yield();
+            }
+        }
     }
 }

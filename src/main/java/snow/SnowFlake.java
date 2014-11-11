@@ -5,7 +5,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 public class SnowFlake {
-    Color color;
     double x;
     double y;
     double radius;
@@ -24,16 +23,9 @@ public class SnowFlake {
 
     void reset() {
         x = Math.random();
-        y = 0;
         radius = Math.random();
+        y = -radius;
         speed = 0.5 + 0.5 * Math.random();
-        int brightness = (int) ((0.7 + Math.random() * 0.3) * 255);
-//        color = new Color(brightness, brightness, brightness);
-        color = new Color(
-                25 * (int)(Math.random() * 10),
-                25 * (int)(Math.random() * 10),
-                25 * (int)(Math.random() * 10)
-        );
     }
 
     private BufferedImage createImage() {
@@ -45,6 +37,13 @@ public class SnowFlake {
         double l3 = 0.5 + Math.random() * 0.5;
         double[] lengths = {l1, l1, l1, l1, l1, l1};
         int thickness = (int) (1 + 20 * Math.random());
+//        int brightness = (int) ((0.7 + Math.random() * 0.3) * 255);
+//        Color color = new Color(brightness, brightness, brightness);
+        Color color = new Color(
+                25 * (int)(Math.random() * 10),
+                25 * (int)(Math.random() * 10),
+                25 * (int)(Math.random() * 10)
+        );
         g.setColor(color);
         for (int i = 0; i < 6; i++) {
             g.setTransform(AffineTransform.getRotateInstance(i * 2 * Math.PI / 6, this.width / 2, this.height / 2));
