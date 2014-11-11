@@ -29,13 +29,13 @@ public class WeatherController {
     private List<SnowFlake> snowFlakes = new ArrayList<>();
     private Thread thread;
     private double windyness = StrictMath.toRadians(50.0);
-    private final int snowflakeWidth = 100;
-    private final int snowflakeHeight = 100;
+    private final int snowflakeWidth = 200;
+    private final int snowflakeHeight = 200;
 
     public void start() {
         stop();
         for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
-            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight));
+            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double)i / SNOW_FLAKE_COUNT)*10)/10));
         }
         thread = new Thread(new SnowFlakeMoverRunnable());
         thread.start();
