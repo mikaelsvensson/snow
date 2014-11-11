@@ -1,1 +1,5 @@
-This file was created by IntelliJ IDEA 12.1.6 for binding GitHub repository
+Java program which displays falling snow in multiple windows.
+
+The simulated snow falls within a shared view/scene and the windows become
+viewports (windows!) to that scene. This means that snowflakes may fall from
+one window to another.
