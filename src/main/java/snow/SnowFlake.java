@@ -10,8 +10,8 @@ public class SnowFlake extends SceneObject {
         super(widthPixels, heightPixels, blur);
     }
 
-    protected BufferedImage createImage(double blur, int requestedWidthPixels, int requestedHeightPixels) {
-        BufferedImage img = new BufferedImage(requestedWidthPixels, requestedHeightPixels, BufferedImage.TYPE_INT_ARGB_PRE);
+    protected BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels) {
+        BufferedImage img = createEmptyImage(requestedWidthPixels, requestedHeightPixels);
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         double l1 = 0.2 + radius * 0.8;
@@ -29,7 +29,7 @@ public class SnowFlake extends SceneObject {
             int length = (int) (lengths[i] * requestedHeightPixels / 2);
             g.fillRect(requestedWidthPixels / 2 - (thickness / 2), requestedHeightPixels / 2 - length, thickness, length);
         }
-        return createBlurredImage(img, blur);
+        return img;
     }
 
 }

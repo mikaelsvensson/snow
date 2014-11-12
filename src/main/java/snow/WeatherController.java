@@ -37,7 +37,13 @@ public class WeatherController {
     public void start() {
         stop();
         for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
-            sceneObjects.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10));
+            double blur = 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10;
+            double v = Math.random();
+            if (v < 0.1) {
+                sceneObjects.add(new DayBubble(100, 100, blur));
+            } else {
+                sceneObjects.add(new SnowFlake(snowflakeWidth, snowflakeHeight, blur));
+            }
         }
         thread = new Thread(new SnowFlakeMoverRunnable());
         thread.start();

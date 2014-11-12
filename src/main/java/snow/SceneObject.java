@@ -24,12 +24,12 @@ public abstract class SceneObject {
 
     public SceneObject(int widthPixels, int heightPixels, double blur) {
         reset(0);
-        this.image = createImage(blur, widthPixels, heightPixels);
+        this.image = createBlurredImage(createImage(widthPixels, heightPixels), blur);
         this.widthPixels = image.getWidth();
         this.heightPixels = image.getHeight();
     }
 
-    protected abstract BufferedImage createImage(double blur, int requestedWidthPixels, int requestedHeightPixels);
+    protected abstract BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels);
 
     /**
      * Filters from http://www.jhlabs.com/ip/index.html
@@ -39,5 +39,9 @@ public abstract class SceneObject {
 //        op = new BoxBlurFilter(5, 5, 3);
         op = new GaussianFilter((float) (blur * 25));
         return op.filter(img, null);
+    }
+
+    protected BufferedImage createEmptyImage(int width, int height) {
+        return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
     }
 }
