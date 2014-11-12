@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
 import java.util.List;
 
 public class SnowPanel extends JPanel implements WeatherController.Listener {
@@ -33,11 +32,11 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
             List<SnowFlake> snowFlakes = WeatherController.getInstance().getSnowFlakes();
             for (SnowFlake snowFlake : snowFlakes) {
                 if (regionClip.contains(snowFlake.x, snowFlake.y)) {
-                    AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(snowFlake.rotation), snowFlake.width / 2, snowFlake.height / 2);
+                    AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(snowFlake.rotation), snowFlake.widthPixels / 2, snowFlake.heightPixels / 2);
 //            transform.rotate(windyness);
                     g2d.setTransform(AffineTransform.getTranslateInstance(
-                            (snowFlake.x - regionVisible.x) * widthFactor - snowFlake.width / 2,
-                            (snowFlake.y - regionVisible.y) * heightFactor - snowFlake.height / 2));
+                            (snowFlake.x - regionVisible.x) * widthFactor - snowFlake.widthPixels / 2,
+                            (snowFlake.y - regionVisible.y) * heightFactor - snowFlake.heightPixels / 2));
                     g2d.drawImage(snowFlake.image, transform, this);
                 }
             }
@@ -55,7 +54,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
         }
         lastTime = now;
         g2d.setColor(Color.red);
-        g2d.drawString(String.valueOf(fps), 0, 10);
+        g2d.drawString(getName() + ": " + String.valueOf(fps) + " fps", 0, 10);
     }
 
     private void onWindowGeometryChange() {
@@ -74,8 +73,8 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
         int maxSnowFlakeHeight = 0;
         int maxSnowFlakeWidth = 0;
         for (SnowFlake snowFlake : snowFlakes) {
-            maxSnowFlakeHeight = Math.max(snowFlake.height, maxSnowFlakeHeight);
-            maxSnowFlakeWidth = Math.max(snowFlake.width, maxSnowFlakeWidth);
+            maxSnowFlakeHeight = Math.max(snowFlake.heightPixels, maxSnowFlakeHeight);
+            maxSnowFlakeWidth = Math.max(snowFlake.widthPixels, maxSnowFlakeWidth);
         }
         double marginX = maxSnowFlakeWidth * region.width / getWidth();
         double marginY = maxSnowFlakeHeight * region.height / getHeight();

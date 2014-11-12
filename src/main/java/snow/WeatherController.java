@@ -35,7 +35,7 @@ public class WeatherController {
     public void start() {
         stop();
         for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
-            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double)i / SNOW_FLAKE_COUNT)*10)/10));
+            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10));
         }
         thread = new Thread(new SnowFlakeMoverRunnable());
         thread.start();
@@ -80,8 +80,11 @@ public class WeatherController {
                 for (SnowFlake snowFlake : snowFlakes) {
                     double changePerMillisecond = snowFlake.speed / MINIMUM_SECONDS_FOR_FALL / 1000;
                     double delta = delay * changePerMillisecond;
-                    if (snowFlake.y + delta > 1.0) {
+                    if (snowFlake.y - snowFlake.height > 1.0) {
+                        double newY = -snowFlake.height;
+                        System.out.println("Resetting snowflake when y = " + snowFlake.y + " (new y = " + newY + ")");
                         snowFlake.reset();
+                        snowFlake.y = newY;
                     } else {
                         snowFlake.y += delta;
                         double degreesPerMillisecond = snowFlake.speed * (360.0 / MINIMUM_SECONDS_FOR_FALL / 1000);
