@@ -50,10 +50,7 @@ public class WindowController {
 
             private void recalculateSceneObjects() {
                 Rectangle sceneBounds = getSceneBounds();
-                List<SnowFlake> snowFlakes = WeatherController.getInstance().getSnowFlakes();
-                for (SnowFlake snowFlake : snowFlakes) {
-                    snowFlake.recalculateRelativeSize(sceneBounds);
-                }
+                WeatherController.getInstance().setSceneBounds(sceneBounds);
                 for (WeatherFrame window : windows) {
                     window.recalibrateSnowPanel(sceneBounds);
                 }

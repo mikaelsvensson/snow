@@ -1,5 +1,6 @@
 package snow;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +9,7 @@ public class WeatherController {
     private static final int SNOW_FLAKE_COUNT = 100;
     private static WeatherController instance;
     private static final long MINIMUM_SECONDS_FOR_FALL = 5;
+    private Rectangle sceneBounds;
 
     public static interface Listener {
         void onSnowFlakeChange();
@@ -57,6 +59,10 @@ public class WeatherController {
         return snowFlakes;
     }
 
+    public void setSceneBounds(Rectangle sceneBounds) {
+        this.sceneBounds = sceneBounds;
+    }
+
     public static WeatherController getInstance() {
         if (instance == null) {
             synchronized (WeatherController.class) {
@@ -80,11 +86,11 @@ public class WeatherController {
                 for (SnowFlake snowFlake : snowFlakes) {
                     double changePerMillisecond = snowFlake.speed / MINIMUM_SECONDS_FOR_FALL / 1000;
                     double delta = delay * changePerMillisecond;
-                    if (snowFlake.y - snowFlake.height > 1.0) {
-                        double newY = -snowFlake.height;
-                        System.out.println("Resetting snowflake when y = " + snowFlake.y + " (new y = " + newY + ")");
-                        snowFlake.reset();
-                        snowFlake.y = newY;
+
+                    double height = sceneBounds != null ? (double) snowFlake.heightPixels / sceneBounds.height : 0;
+
+                    if (snowFlake.y - height > 1.0) {
+                        snowFlake.reset(-height);
                     } else {
                         snowFlake.y += delta;
                         double degreesPerMillisecond = snowFlake.speed * (360.0 / MINIMUM_SECONDS_FOR_FALL / 1000);

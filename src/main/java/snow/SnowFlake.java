@@ -17,21 +17,19 @@ public class SnowFlake {
     int widthPixels;
     int heightPixels;
     private double blur;
-    double height;
-    private double width;
 
     public SnowFlake(int widthPixels, int heightPixels, double blur) {
-        reset();
+        reset(0);
         this.blur = blur;
         this.widthPixels = widthPixels;
         this.heightPixels = heightPixels;
         image = createImage();
     }
 
-    void reset() {
-        x = Math.random();
+    void reset(double y) {
         radius = Math.random();
-        y = -radius;
+        this.x = Math.random();
+        this.y = y;
         speed = 0.5 + 0.5 * Math.random();
     }
 
@@ -66,10 +64,5 @@ public class SnowFlake {
 //        op = new BoxBlurFilter(5, 5, 3);
         op = new GaussianFilter((float) (blur * 25));
         return op.filter(img, null);
-    }
-
-    public void recalculateRelativeSize(Rectangle sceneBounds) {
-        height = sceneBounds != null ? (double) heightPixels / sceneBounds.height : 0;
-        width = sceneBounds != null ? (double) widthPixels / sceneBounds.width : 0;
     }
 }
