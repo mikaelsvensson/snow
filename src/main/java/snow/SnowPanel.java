@@ -14,6 +14,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
     private double widthFactor;
     private double heightFactor;
     private Rectangle2D.Double regionClip;
+    private double windyness = StrictMath.toRadians(50.0);
 
     public SnowPanel() {
         setDoubleBuffered(true);

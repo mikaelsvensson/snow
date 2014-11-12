@@ -30,7 +30,6 @@ public class WeatherController {
 
     private List<SceneObject> sceneObjects = new ArrayList<>();
     private Thread thread;
-    private double windyness = StrictMath.toRadians(50.0);
     private final int snowflakeWidth = 200;
     private final int snowflakeHeight = 200;
 
