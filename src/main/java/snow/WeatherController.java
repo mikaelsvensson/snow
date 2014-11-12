@@ -28,7 +28,7 @@ public class WeatherController {
         listeners.remove(listener);
     }
 
-    private List<SnowFlake> snowFlakes = new ArrayList<>();
+    private List<SceneObject> sceneObjects = new ArrayList<>();
     private Thread thread;
     private double windyness = StrictMath.toRadians(50.0);
     private final int snowflakeWidth = 200;
@@ -37,7 +37,7 @@ public class WeatherController {
     public void start() {
         stop();
         for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
-            snowFlakes.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10));
+            sceneObjects.add(new SnowFlake(snowflakeWidth, snowflakeHeight, 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10));
         }
         thread = new Thread(new SnowFlakeMoverRunnable());
         thread.start();
@@ -55,8 +55,8 @@ public class WeatherController {
         }
     }
 
-    public List<SnowFlake> getSnowFlakes() {
-        return snowFlakes;
+    public List<SceneObject> getSnowFlakes() {
+        return sceneObjects;
     }
 
     public void setSceneBounds(Rectangle sceneBounds) {
@@ -83,18 +83,18 @@ public class WeatherController {
                 long now = System.currentTimeMillis();
                 long delay = now - lastTime;
                 lastTime = now;
-                for (SnowFlake snowFlake : snowFlakes) {
-                    double changePerMillisecond = snowFlake.speed / MINIMUM_SECONDS_FOR_FALL / 1000;
+                for (SceneObject sceneObject : sceneObjects) {
+                    double changePerMillisecond = sceneObject.speed / MINIMUM_SECONDS_FOR_FALL / 1000;
                     double delta = delay * changePerMillisecond;
 
-                    double height = sceneBounds != null ? (double) snowFlake.heightPixels / sceneBounds.height : 0;
+                    double height = sceneBounds != null ? (double) sceneObject.heightPixels / sceneBounds.height : 0;
 
-                    if (snowFlake.y - height > 1.0) {
-                        snowFlake.reset(-height);
+                    if (sceneObject.y - height > 1.0) {
+                        sceneObject.reset(-height);
                     } else {
-                        snowFlake.y += delta;
-                        double degreesPerMillisecond = snowFlake.speed * (360.0 / MINIMUM_SECONDS_FOR_FALL / 1000);
-                        snowFlake.rotation = (snowFlake.rotation + (degreesPerMillisecond * delay)) % 360;
+                        sceneObject.y += delta;
+                        double degreesPerMillisecond = sceneObject.speed * (360.0 / MINIMUM_SECONDS_FOR_FALL / 1000);
+                        sceneObject.rotation = (sceneObject.rotation + (degreesPerMillisecond * delay)) % 360;
                     }
                 }
                 fireListeners();

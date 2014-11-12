@@ -29,15 +29,15 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
 
         if (regionVisible != null) {
             AffineTransform oldTransform = g2d.getTransform();
-            List<SnowFlake> snowFlakes = WeatherController.getInstance().getSnowFlakes();
-            for (SnowFlake snowFlake : snowFlakes) {
-                if (regionClip.contains(snowFlake.x, snowFlake.y)) {
-                    AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(snowFlake.rotation), snowFlake.widthPixels / 2, snowFlake.heightPixels / 2);
+            List<SceneObject> sceneObjects = WeatherController.getInstance().getSnowFlakes();
+            for (SceneObject sceneObject : sceneObjects) {
+                if (regionClip.contains(sceneObject.x, sceneObject.y)) {
+                    AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(sceneObject.rotation), sceneObject.widthPixels / 2, sceneObject.heightPixels / 2);
 //            transform.rotate(windyness);
                     g2d.setTransform(AffineTransform.getTranslateInstance(
-                            (snowFlake.x - regionVisible.x) * widthFactor - snowFlake.widthPixels / 2,
-                            (snowFlake.y - regionVisible.y) * heightFactor - snowFlake.heightPixels / 2));
-                    g2d.drawImage(snowFlake.image, transform, this);
+                            (sceneObject.x - regionVisible.x) * widthFactor - sceneObject.widthPixels / 2,
+                            (sceneObject.y - regionVisible.y) * heightFactor - sceneObject.heightPixels / 2));
+                    g2d.drawImage(sceneObject.image, transform, this);
                 }
             }
             g2d.setTransform(oldTransform);
@@ -69,12 +69,12 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
     }
 
     public void setRegion(Rectangle2D.Double region) {
-        List<SnowFlake> snowFlakes = WeatherController.getInstance().getSnowFlakes();
+        List<SceneObject> sceneObjects = WeatherController.getInstance().getSnowFlakes();
         int maxSnowFlakeHeight = 0;
         int maxSnowFlakeWidth = 0;
-        for (SnowFlake snowFlake : snowFlakes) {
-            maxSnowFlakeHeight = Math.max(snowFlake.heightPixels, maxSnowFlakeHeight);
-            maxSnowFlakeWidth = Math.max(snowFlake.widthPixels, maxSnowFlakeWidth);
+        for (SceneObject sceneObject : sceneObjects) {
+            maxSnowFlakeHeight = Math.max(sceneObject.heightPixels, maxSnowFlakeHeight);
+            maxSnowFlakeWidth = Math.max(sceneObject.widthPixels, maxSnowFlakeWidth);
         }
         double marginX = maxSnowFlakeWidth * region.width / getWidth();
         double marginY = maxSnowFlakeHeight * region.height / getHeight();
