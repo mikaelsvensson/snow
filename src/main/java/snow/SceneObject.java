@@ -2,6 +2,7 @@ package snow;
 
 import com.jhlabs.image.GaussianFilter;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
@@ -10,26 +11,36 @@ public abstract class SceneObject {
     public double rotation;
     double x;
     double y;
-    double radius;
     double speed;
     int widthPixels;
     int heightPixels;
+    public boolean dead;
 
-    void reset(double y) {
+/*
+    void reset(double x, double y) {
         radius = Math.random();
-        this.x = Math.random();
+        this.x = x;
         this.y = y;
         speed = 0.5 + 0.5 * Math.random();
     }
+*/
 
-    public SceneObject(int widthPixels, int heightPixels, double blur) {
-        reset(0);
+    public SceneObject(int widthPixels, int heightPixels, double blur, double x1, double y1, Rectangle sceneBounds) {
+        this.x = x1;
+        this.y = y1;
+        speed = 0.5 + 0.5 * Math.random();
+        init(widthPixels, heightPixels, sceneBounds, blur);
+    }
+
+    protected abstract BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels);
+
+    public abstract void update(long msSinceLastUpdate, Rectangle sceneBounds);
+
+    public void init(int widthPixels, int heightPixels, Rectangle sceneBounds, double blur) {
         this.image = createBlurredImage(createImage(widthPixels, heightPixels), blur);
         this.widthPixels = image.getWidth();
         this.heightPixels = image.getHeight();
     }
-
-    protected abstract BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels);
 
     /**
      * Filters from http://www.jhlabs.com/ip/index.html

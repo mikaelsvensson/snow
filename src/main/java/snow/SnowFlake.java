@@ -4,17 +4,17 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-public class SnowFlake extends SceneObject {
+public class SnowFlake extends FallingSceneObject {
 
-    public SnowFlake(int widthPixels, int heightPixels, double blur) {
-        super(widthPixels, heightPixels, blur);
+    public SnowFlake(int widthPixels, int heightPixels, double blur, Rectangle sceneBounds) {
+        super(widthPixels, heightPixels, blur, sceneBounds);
     }
 
     protected BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels) {
         BufferedImage img = createEmptyImage(requestedWidthPixels, requestedHeightPixels);
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        double l1 = 0.2 + radius * 0.8;
+        double l1 = 0.2 + Math.random() * 0.8;
         double l2 = 0.5 + Math.random() * 0.5;
         double l3 = 0.5 + Math.random() * 0.5;
         double[] lengths = {l1, l1, l1, l1, l1, l1};

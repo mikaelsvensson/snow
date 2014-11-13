@@ -21,7 +21,6 @@ public class WinterWindows {
                             Integer.parseInt(part[3]),
                             part.length > 4 ? part[4] : null);
                 }
-                WeatherController.getInstance().start();
             }
 
         });

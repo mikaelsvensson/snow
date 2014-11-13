@@ -5,12 +5,12 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Calendar;
 
-public class DayBubble extends SceneObject {
+public class DayBubble extends FallingSceneObject {
 
     private static final Font FONT = new Font(Font.SERIF, Font.PLAIN, 100);
 
-    public DayBubble(int widthPixels, int heightPixels, double blur) {
-        super(widthPixels, heightPixels, blur);
+    public DayBubble(int widthPixels, int heightPixels, double blur, Rectangle sceneBounds) {
+        super(widthPixels, heightPixels, blur, sceneBounds);
     }
 
     @Override

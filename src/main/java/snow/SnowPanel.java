@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
 
 public class SnowPanel extends JPanel implements WeatherController.Listener {
     private int fps;
@@ -30,7 +29,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
 
         if (regionVisible != null) {
             AffineTransform oldTransform = g2d.getTransform();
-            List<SceneObject> sceneObjects = WeatherController.getInstance().getSnowFlakes();
+            SceneObject[] sceneObjects = WeatherController.getInstance().getSnowFlakes();
             for (SceneObject sceneObject : sceneObjects) {
                 if (regionClip.contains(sceneObject.x, sceneObject.y)) {
                     AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(sceneObject.rotation), sceneObject.widthPixels / 2, sceneObject.heightPixels / 2);
@@ -70,7 +69,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
     }
 
     public void setRegion(Rectangle2D.Double region) {
-        List<SceneObject> sceneObjects = WeatherController.getInstance().getSnowFlakes();
+        SceneObject[] sceneObjects = WeatherController.getInstance().getSnowFlakes();
         int maxSnowFlakeHeight = 0;
         int maxSnowFlakeWidth = 0;
         for (SceneObject sceneObject : sceneObjects) {
