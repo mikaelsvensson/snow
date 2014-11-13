@@ -52,7 +52,7 @@ public class WindowController {
                 Rectangle sceneBounds = getSceneBounds();
                 WeatherController.getInstance().setSceneBounds(sceneBounds);
                 for (WeatherFrame window : windows) {
-                    window.recalibrateSnowPanel(sceneBounds);
+                    window.recalibratePanel(sceneBounds);
                 }
             }
 

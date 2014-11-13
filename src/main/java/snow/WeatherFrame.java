@@ -7,14 +7,14 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 
 class WeatherFrame extends JFrame {
-    private final SnowPanel snowPanel;
+    private final SceneRegionPanel sceneRegionPanel;
 
 
     public WeatherFrame() throws HeadlessException {
         setUndecorated(true);
-        snowPanel = new SnowPanel();
-        snowPanel.setPreferredSize(new Dimension(600, 600));
-        setContentPane(snowPanel);
+        sceneRegionPanel = new SceneRegionPanel();
+        sceneRegionPanel.setPreferredSize(new Dimension(600, 600));
+        setContentPane(sceneRegionPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         pack();
@@ -31,7 +31,7 @@ class WeatherFrame extends JFrame {
     @Override
     public void setName(String name) {
         super.setName(name);
-        snowPanel.setName(name);
+        sceneRegionPanel.setName(name);
     }
 
     private void handleKeyEvent(KeyEvent e) {
@@ -61,7 +61,7 @@ class WeatherFrame extends JFrame {
         setLocation(getLocation().x + deltaX, getLocation().y + deltaY);
     }
 
-    void recalibrateSnowPanel(Rectangle sceneBounds) {
+    void recalibratePanel(Rectangle sceneBounds) {
         if (isVisible()) {
             Rectangle frameBoundsWithinScene = getBounds();
 
@@ -73,7 +73,7 @@ class WeatherFrame extends JFrame {
                     (double) frameBoundsWithinScene.width / sceneBounds.width,
                     (double) frameBoundsWithinScene.height / sceneBounds.height);
 
-            snowPanel.setRegion(region);
+            sceneRegionPanel.setRegion(region);
         }
     }
 

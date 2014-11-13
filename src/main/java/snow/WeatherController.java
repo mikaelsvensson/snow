@@ -7,13 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class WeatherController {
-    private static final int SNOW_FLAKE_COUNT = 100;
+    private static final int OBJECT_COUNT = 100;
     private static WeatherController instance;
     private Rectangle sceneBounds;
     private Thread cleanUpThread;
 
     public static interface Listener {
-        void onSnowFlakeChange();
+        void onSceneChange();
     }
 
     private WeatherController() {
@@ -38,13 +38,13 @@ public class WeatherController {
     public void start() {
         stop();
         synchronized (this) {
-            for (int i = 0; i < SNOW_FLAKE_COUNT; i++) {
-                double blur = 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10;
+            for (int i = 0; i < OBJECT_COUNT; i++) {
+                double blur = 1.0 - (((double) i / OBJECT_COUNT) * 10) / 10;
                 sceneObjects.add(createRandomSceneObject(blur));
             }
             updateSceneObjectsCopy();
         }
-        thread = new Thread(new SnowFlakeMoverRunnable());
+        thread = new Thread(new ObjectUpdaterRunnable());
         thread.start();
         cleanUpThread = new Thread(new CleanUpRunnable());
         cleanUpThread.setPriority(Thread.MIN_PRIORITY);
@@ -66,7 +66,7 @@ public class WeatherController {
 
     private synchronized void fireListeners() {
         for (Listener listener : listeners) {
-            listener.onSnowFlakeChange();
+            listener.onSceneChange();
         }
     }
 
@@ -81,7 +81,7 @@ public class WeatherController {
         }
     }
 
-    public SceneObject[] getSnowFlakes() {
+    public SceneObject[] getSceneObjects() {
         synchronized (this) {
             return sceneObjectsCopy;
         }
@@ -105,7 +105,7 @@ public class WeatherController {
         return instance;
     }
 
-    private class SnowFlakeMoverRunnable implements Runnable {
+    private class ObjectUpdaterRunnable implements Runnable {
 
         @Override
         public void run() {

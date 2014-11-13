@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-public class SnowPanel extends JPanel implements WeatherController.Listener {
+public class SceneRegionPanel extends JPanel implements WeatherController.Listener {
     private int fps;
     private long lastTime;
     private Rectangle2D.Double regionVisible;
@@ -15,7 +15,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
     private Rectangle2D.Double regionClip;
     private double windyness = StrictMath.toRadians(50.0);
 
-    public SnowPanel() {
+    public SceneRegionPanel() {
         setDoubleBuffered(true);
         WeatherController.getInstance().addListener(this);
     }
@@ -29,7 +29,7 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
 
         if (regionVisible != null) {
             AffineTransform oldTransform = g2d.getTransform();
-            SceneObject[] sceneObjects = WeatherController.getInstance().getSnowFlakes();
+            SceneObject[] sceneObjects = WeatherController.getInstance().getSceneObjects();
             for (SceneObject sceneObject : sceneObjects) {
                 if (regionClip.contains(sceneObject.x, sceneObject.y)) {
                     AffineTransform transform = AffineTransform.getRotateInstance(StrictMath.toRadians(sceneObject.rotation), sceneObject.widthPixels / 2, sceneObject.heightPixels / 2);
@@ -64,20 +64,20 @@ public class SnowPanel extends JPanel implements WeatherController.Listener {
     }
 
     @Override
-    public void onSnowFlakeChange() {
+    public void onSceneChange() {
         repaint();
     }
 
     public void setRegion(Rectangle2D.Double region) {
-        SceneObject[] sceneObjects = WeatherController.getInstance().getSnowFlakes();
-        int maxSnowFlakeHeight = 0;
-        int maxSnowFlakeWidth = 0;
+        SceneObject[] sceneObjects = WeatherController.getInstance().getSceneObjects();
+        int maxObjectHeight = 0;
+        int maxObjectWidth = 0;
         for (SceneObject sceneObject : sceneObjects) {
-            maxSnowFlakeHeight = Math.max(sceneObject.heightPixels, maxSnowFlakeHeight);
-            maxSnowFlakeWidth = Math.max(sceneObject.widthPixels, maxSnowFlakeWidth);
+            maxObjectHeight = Math.max(sceneObject.heightPixels, maxObjectHeight);
+            maxObjectWidth = Math.max(sceneObject.widthPixels, maxObjectWidth);
         }
-        double marginX = maxSnowFlakeWidth * region.width / getWidth();
-        double marginY = maxSnowFlakeHeight * region.height / getHeight();
+        double marginX = maxObjectWidth * region.width / getWidth();
+        double marginY = maxObjectHeight * region.height / getHeight();
         this.regionVisible = region;
         this.regionClip = new Rectangle2D.Double(region.x - marginX, region.y - marginY, region.width + marginX + marginX, region.height + marginY + marginY);
         onWindowGeometryChange();
