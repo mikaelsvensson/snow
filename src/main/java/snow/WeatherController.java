@@ -51,15 +51,15 @@ public class WeatherController {
         cleanUpThread.start();
     }
 
-    private SceneObject createRandomSceneObject(double blur) {
+    private SceneObject createRandomSceneObject(double z) {
         double v = Math.random();
         SceneObject obj;
         if (v < 0.1) {
-            obj = new DayBubble(100, 100, blur, sceneBounds);
+            obj = new DayBubble(100, 100, z, sceneBounds);
         } else if (v < 0.15) {
-            obj = new Cloud(300, 300, blur, sceneBounds);
+            obj = new Cloud(300, 300, z, sceneBounds);
         } else {
-            obj = new SnowFlake(snowflakeWidth, snowflakeHeight, blur, sceneBounds);
+            obj = new SnowFlake(snowflakeWidth, snowflakeHeight, z, sceneBounds);
         }
         return obj;
     }
@@ -139,7 +139,7 @@ public class WeatherController {
                 synchronized (sceneObjects) {
                     Iterator<SceneObject> it = sceneObjects.iterator();
                     int i = 0;
-                    List<Double> newObjectsBlurs = new ArrayList<>();
+                    List<Double> newObjectZs = new ArrayList<>();
                     while (it.hasNext()) {
                         SceneObject next = it.next();
 
@@ -149,13 +149,12 @@ public class WeatherController {
                         boolean isObjectOutsideScene = next.x - width/2 > 1.0 || next.y - height/2 > 1.0;
                         if (isObjectOutsideScene) {
                             it.remove();
-                            double blur = 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10;
-                            newObjectsBlurs.add(blur);
+                            newObjectZs.add(next.z);
                         }
                         i++;
                     }
-                    for (Double blur : newObjectsBlurs) {
-                        sceneObjects.add(createRandomSceneObject(blur));
+                    for (Double z : newObjectZs) {
+                        sceneObjects.add(createRandomSceneObject(z));
                         Thread.yield();
                     }
                     updateSceneObjectsCopy();

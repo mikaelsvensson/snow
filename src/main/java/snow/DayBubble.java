@@ -9,8 +9,8 @@ public class DayBubble extends FallingSceneObject {
 
     private static final Font FONT = new Font(Font.SERIF, Font.PLAIN, 100);
 
-    public DayBubble(int widthPixels, int heightPixels, double blur, Rectangle sceneBounds) {
-        super(widthPixels, heightPixels, blur, sceneBounds);
+    public DayBubble(int widthPixels, int heightPixels, double z, Rectangle sceneBounds) {
+        super(widthPixels, heightPixels, z, sceneBounds);
     }
 
     @Override

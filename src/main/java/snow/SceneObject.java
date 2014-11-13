@@ -11,23 +11,37 @@ public abstract class SceneObject {
     public double rotation;
     double x;
     double y;
+    double z;
     double speed;
     int widthPixels;
     int heightPixels;
 
-    public SceneObject(int widthPixels, int heightPixels, double blur, double x1, double y1) {
-        this.x = x1;
-        this.y = y1;
-        speed = 0.5 + 0.5 * Math.random();
-        init(widthPixels, heightPixels, blur);
+    /**
+     * @param widthPixels
+     * @param heightPixels
+     * @param x
+     * @param y            The distance from point-of-view (the user) to the object. 0 = right in the front, 1 = as far away as possible.
+     * @param z
+     */
+    public SceneObject(int widthPixels, int heightPixels, double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        speed = 0.5 + 0.5 * (1.0 - z);
+        init(widthPixels, heightPixels, z);
     }
 
     protected abstract BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels);
 
     public abstract void update(long msSinceLastUpdate, Rectangle sceneBounds);
 
-    public void init(int widthPixels, int heightPixels, double blur) {
-        this.image = createBlurredImage(createImage(widthPixels, heightPixels), blur);
+    /**
+     * @param widthPixels
+     * @param heightPixels
+     * @param z
+     */
+    public void init(int widthPixels, int heightPixels, double z) {
+        this.image = createBlurredImage(createImage((int) (widthPixels * (1.0 - Math.min(z, 0.1))), (int) (heightPixels * (1.0 - Math.min(z, 0.1)))), z);
         this.widthPixels = image.getWidth();
         this.heightPixels = image.getHeight();
     }

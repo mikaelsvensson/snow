@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 
 public class SnowFlake extends FallingSceneObject {
 
-    public SnowFlake(int widthPixels, int heightPixels, double blur, Rectangle sceneBounds) {
-        super(widthPixels, heightPixels, blur, sceneBounds);
+    public SnowFlake(int widthPixels, int heightPixels, double z, Rectangle sceneBounds) {
+        super(widthPixels, heightPixels, z, sceneBounds);
     }
 
     protected BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels) {

@@ -9,12 +9,10 @@ public class Cloud extends SceneObject {
     private static final int BLUR_MARGIN = 25;
     private static final int CLOUD_CIRCLE_DIAMETER = 100;
 
-    public Cloud(int requestedWidthPixels, int requestedHeightPixels, double blur, Rectangle sceneBounds) {
+    public Cloud(int requestedWidthPixels, int requestedHeightPixels, double z, Rectangle sceneBounds) {
         super(requestedWidthPixels,
                 requestedHeightPixels,
-                blur,
-                -((double) requestedWidthPixels / sceneBounds.width),
-                Math.random()
+                -((double) requestedWidthPixels / sceneBounds.width), Math.random(), z
         );
     }
 

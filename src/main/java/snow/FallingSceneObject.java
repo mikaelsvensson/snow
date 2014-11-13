@@ -3,14 +3,12 @@ package snow;
 import java.awt.*;
 
 public abstract class FallingSceneObject extends SceneObject {
-    private static final long MINIMUM_SECONDS_FOR_FALL = 3;
+    private static final long MINIMUM_SECONDS_FOR_FALL = 5;
 
-    public FallingSceneObject(int requestedWidthPixels, int requestedHeightPixels, double blur, Rectangle sceneBounds) {
+    public FallingSceneObject(int requestedWidthPixels, int requestedHeightPixels, double z, Rectangle sceneBounds) {
         super(requestedWidthPixels,
                 requestedHeightPixels,
-                blur,
-                Math.random(),
-                -((double) requestedHeightPixels / sceneBounds.height)
+                Math.random(), -((double) requestedHeightPixels / sceneBounds.height), z
         );
     }
 
