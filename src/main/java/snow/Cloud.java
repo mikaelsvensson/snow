@@ -14,8 +14,8 @@ public class Cloud extends SceneObject {
                 requestedHeightPixels,
                 blur,
                 -((double) requestedWidthPixels / sceneBounds.width),
-                Math.random(),
-                sceneBounds);
+                Math.random()
+        );
     }
 
     @Override
@@ -37,10 +37,6 @@ public class Cloud extends SceneObject {
         double delta = msSinceLastUpdate * changePerMillisecond;
         double width = sceneBounds != null ? (double) widthPixels / sceneBounds.width : 0;
 
-        if (x - width > 1.0) {
-            dead = true;
-        } else {
-            x += delta;
-        }
+        x += delta;
     }
 }

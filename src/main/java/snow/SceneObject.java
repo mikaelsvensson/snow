@@ -14,29 +14,19 @@ public abstract class SceneObject {
     double speed;
     int widthPixels;
     int heightPixels;
-    public boolean dead;
 
-/*
-    void reset(double x, double y) {
-        radius = Math.random();
-        this.x = x;
-        this.y = y;
-        speed = 0.5 + 0.5 * Math.random();
-    }
-*/
-
-    public SceneObject(int widthPixels, int heightPixels, double blur, double x1, double y1, Rectangle sceneBounds) {
+    public SceneObject(int widthPixels, int heightPixels, double blur, double x1, double y1) {
         this.x = x1;
         this.y = y1;
         speed = 0.5 + 0.5 * Math.random();
-        init(widthPixels, heightPixels, sceneBounds, blur);
+        init(widthPixels, heightPixels, blur);
     }
 
     protected abstract BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels);
 
     public abstract void update(long msSinceLastUpdate, Rectangle sceneBounds);
 
-    public void init(int widthPixels, int heightPixels, Rectangle sceneBounds, double blur) {
+    public void init(int widthPixels, int heightPixels, double blur) {
         this.image = createBlurredImage(createImage(widthPixels, heightPixels), blur);
         this.widthPixels = image.getWidth();
         this.heightPixels = image.getHeight();

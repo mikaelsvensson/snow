@@ -118,7 +118,6 @@ public class WeatherController {
                     for (SceneObject sceneObject : sceneObjectsCopy) {
                         sceneObject.update(delay, sceneBounds);
                     }
-//                    updateSceneObjectsCopy();
                 }
                 fireListeners();
                 Thread.yield();
@@ -143,7 +142,12 @@ public class WeatherController {
                     List<Double> newObjectsBlurs = new ArrayList<>();
                     while (it.hasNext()) {
                         SceneObject next = it.next();
-                        if (next.dead) {
+
+                        double width = sceneBounds != null ? (double) next.widthPixels / sceneBounds.width : 0;
+                        double height = sceneBounds != null ? (double) next.heightPixels / sceneBounds.height : 0;
+
+                        boolean isObjectOutsideScene = next.x - width/2 > 1.0 || next.y - height/2 > 1.0;
+                        if (isObjectOutsideScene) {
                             it.remove();
                             double blur = 1.0 - (((double) i / SNOW_FLAKE_COUNT) * 10) / 10;
                             newObjectsBlurs.add(blur);
