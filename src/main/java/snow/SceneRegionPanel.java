@@ -3,10 +3,13 @@ package snow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 public class SceneRegionPanel extends JPanel implements WeatherController.Listener {
+    private static final int HIDE_HELP_DELAY = 3000;
     private int fps;
     private long lastTime;
     private Rectangle2D.Double regionVisible;
@@ -14,10 +17,18 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
     private double heightFactor;
     private Rectangle2D.Double regionClip;
     private double windyness = StrictMath.toRadians(50.0);
+    private long lastKeyPressTimeStamp;
 
     public SceneRegionPanel() {
         setDoubleBuffered(true);
         WeatherController.getInstance().addListener(this);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                lastKeyPressTimeStamp = System.currentTimeMillis();
+            }
+        });
     }
 
     @Override
@@ -46,6 +57,17 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
             g2d.drawString("No regionVisible specified", 0, 20);
         }
 
+
+        if (System.currentTimeMillis() - lastKeyPressTimeStamp < HIDE_HELP_DELAY) {
+            drawHelp(g2d);
+        }
+    }
+
+    private void drawHelp(Graphics2D g2d) {
+        int y = 20;
+
+        g2d.setColor(Color.red);
+
         long now = System.currentTimeMillis();
         long delay = now - lastTime;
         if (now / 1000 != lastTime / 1000) {
@@ -53,8 +75,13 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
             fps = (int) (1000.0 / delay);
         }
         lastTime = now;
-        g2d.setColor(Color.red);
-        g2d.drawString(getName() + ": " + String.valueOf(fps) + " fps", 0, 10);
+        g2d.drawString(getName() + ": " + String.valueOf(fps) + " fps", 10, y);
+
+        for (KeyStroke key : getInputMap().keys()) {
+            y += 20;
+            g2d.drawString(KeyEvent.getKeyText(key.getKeyCode()), 10, y);
+            g2d.drawString(getActionMap().get(getInputMap().get(key)).getValue(Action.NAME).toString(), 100, y);
+        }
     }
 
     private void onWindowGeometryChange() {

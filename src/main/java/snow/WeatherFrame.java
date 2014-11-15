@@ -2,13 +2,12 @@ package snow;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 
 class WeatherFrame extends JFrame {
     private final SceneRegionPanel sceneRegionPanel;
-
 
     public WeatherFrame() throws HeadlessException {
         setUndecorated(true);
@@ -19,42 +18,55 @@ class WeatherFrame extends JFrame {
 
         pack();
 
-        addKeyListener(new KeyAdapter() {
+//        System.out.println(KeyEvent.getKeyText(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0).getKeyCode()));
+
+        registerAction(KeyEvent.VK_LEFT, new AbstractAction("Flytta fönster till vänster") {
             @Override
-            public void keyPressed(KeyEvent e) {
-                handleKeyEvent(e);
-                super.keyPressed(e);
+            public void actionPerformed(ActionEvent e) {
+                moveFrame(-50, 0);
             }
         });
+        registerAction(KeyEvent.VK_RIGHT, new AbstractAction("Flytta fönster till höger") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveFrame(50, 0);
+            }
+        });
+        registerAction(KeyEvent.VK_UP, new AbstractAction("Flytta fönster uppåt") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveFrame(0, -50);
+            }
+        });
+        registerAction(KeyEvent.VK_DOWN, new AbstractAction("Flytta fönster nedåt") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveFrame(0, 50);
+            }
+        });
+        registerAction(KeyEvent.VK_INSERT, new AbstractAction("Klona fönster") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WindowController.getInstance().showNewWindow(getX() + 10, getY() + 10, getWidth(), getHeight(), null);
+            }
+        });
+        registerAction(KeyEvent.VK_ESCAPE, new AbstractAction("Stäng fönster") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+    }
+
+    private void registerAction(int keyCode, AbstractAction action) {
+        sceneRegionPanel.getInputMap().put(KeyStroke.getKeyStroke(keyCode, 0), action.getValue(Action.NAME));
+        sceneRegionPanel.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     @Override
     public void setName(String name) {
         super.setName(name);
         sceneRegionPanel.setName(name);
-    }
-
-    private void handleKeyEvent(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_LEFT:
-                moveFrame(e.isShiftDown() ? -100 : -20, 0);
-                break;
-            case KeyEvent.VK_RIGHT:
-                moveFrame(e.isShiftDown() ? 100 : 20, 0);
-                break;
-            case KeyEvent.VK_UP:
-                moveFrame(0, e.isShiftDown() ? -100 : -20);
-                break;
-            case KeyEvent.VK_DOWN:
-                moveFrame(0, e.isShiftDown() ? 100 : 20);
-                break;
-            case KeyEvent.VK_INSERT:
-                WindowController.getInstance().showNewWindow(getX() + 10, getY() + 10, getWidth(), getHeight(), null);
-                break;
-            case KeyEvent.VK_DELETE:
-                dispose();
-                break;
-        }
     }
 
     void moveFrame(int deltaX, int deltaY) {
