@@ -1,6 +1,11 @@
 package snow;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -9,6 +14,7 @@ public class WeatherController {
     private static WeatherController instance;
     private Rectangle sceneBounds;
     private Thread cleanUpThread;
+    private Thread imageFolderMonitorThread;
 
     public static interface Listener {
         void onSceneChange();
@@ -45,6 +51,9 @@ public class WeatherController {
         cleanUpThread = new Thread(new CleanUpRunnable());
         cleanUpThread.setPriority(Thread.MIN_PRIORITY);
         cleanUpThread.start();
+        imageFolderMonitorThread = new Thread(new ImageFolderMonitorRunnable());
+        imageFolderMonitorThread.setPriority(Thread.MIN_PRIORITY);
+        imageFolderMonitorThread.start();
     }
 
     private SceneObject createRandomSceneObject(double z) {
@@ -73,6 +82,10 @@ public class WeatherController {
         }
         if (cleanUpThread != null) {
             cleanUpThread.interrupt();
+            thread = null;
+        }
+        if (imageFolderMonitorThread != null) {
+            imageFolderMonitorThread.interrupt();
             thread = null;
         }
     }
@@ -151,19 +164,73 @@ public class WeatherController {
         }
     }
 
+    private class ImageFolderMonitorRunnable implements Runnable {
+
+        private List<File> filesThen = Collections.emptyList();
+
+        @Override
+        public void run() {
+            File folder = new File("images");
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            while (!Thread.currentThread().isInterrupted()) {
+                List<File> filesNow = Arrays.asList(folder.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(".jpg");
+                    }
+                }));
+
+                for (final File file : filesNow) {
+                    if (!filesThen.contains(file)) {
+                        // New file
+                        try {
+                            final BufferedImage bufferedImage = ImageIO.read(file);
+                            synchronized (sceneObjects) {
+                                sceneObjects.add(new Cloud(bufferedImage.getWidth(), bufferedImage.getHeight(), Math.random(), sceneBounds) {
+                                    @Override
+                                    protected BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels) {
+                                        return bufferedImage;
+                                    }
+                                });
+                                sortSceneObjectByZ();
+                            }
+                            updateSceneObjectsCopy();
+                            Thread.yield();
+                        } catch (IOException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+                    }
+                }
+
+                filesThen = filesNow;
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+
     private void addMissingSceneObjects() {
         synchronized (sceneObjects) {
             while (sceneObjects.size() < objectCount) {
                 sceneObjects.add(createRandomSceneObject(Math.random()));
 //                        Thread.yield();
             }
-            Collections.sort(sceneObjects, new Comparator<SceneObject>() {
-                @Override
-                public int compare(SceneObject o1, SceneObject o2) {
-                    return (int) (o1.z - o2.z);
-                }
-            });
+            sortSceneObjectByZ();
         }
         updateSceneObjectsCopy();
+    }
+
+    private void sortSceneObjectByZ() {
+        Collections.sort(sceneObjects, new Comparator<SceneObject>() {
+            @Override
+            public int compare(SceneObject o1, SceneObject o2) {
+                return (int) (o1.z - o2.z);
+            }
+        });
     }
 }
