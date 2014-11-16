@@ -50,6 +50,18 @@ class WeatherFrame extends JFrame {
                 WindowController.getInstance().showNewWindow(getX() + 10, getY() + 10, getWidth(), getHeight(), null);
             }
         });
+        registerAction(KeyEvent.VK_PAGE_UP, new AbstractAction("Fler objekt") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WeatherController.getInstance().changeObjectCount(10);
+            }
+        });
+        registerAction(KeyEvent.VK_PAGE_DOWN, new AbstractAction("Färre objekt") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WeatherController.getInstance().changeObjectCount(-10);
+            }
+        });
         registerAction(KeyEvent.VK_ESCAPE, new AbstractAction("Stäng fönster") {
             @Override
             public void actionPerformed(ActionEvent e) {

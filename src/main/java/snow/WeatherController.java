@@ -1,13 +1,11 @@
 package snow;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 public class WeatherController {
-    private static final int OBJECT_COUNT = 100;
+    private int objectCount = 50;
     private static WeatherController instance;
     private Rectangle sceneBounds;
     private Thread cleanUpThread;
@@ -29,6 +27,10 @@ public class WeatherController {
         listeners.remove(listener);
     }
 
+    public void changeObjectCount(int delta) {
+        objectCount = Math.max(0, objectCount + delta);
+    }
+
     private List<SceneObject> sceneObjects = new ArrayList<>();
     private SceneObject[] sceneObjectsCopy = null;
     private Thread thread;
@@ -37,13 +39,7 @@ public class WeatherController {
 
     public void start() {
         stop();
-        synchronized (this) {
-            for (int i = 0; i < OBJECT_COUNT; i++) {
-                double blur = 1.0 - (((double) i / OBJECT_COUNT) * 10) / 10;
-                sceneObjects.add(createRandomSceneObject(blur));
-            }
-            updateSceneObjectsCopy();
-        }
+        addMissingSceneObjects();
         thread = new Thread(new ObjectUpdaterRunnable());
         thread.start();
         cleanUpThread = new Thread(new CleanUpRunnable());
@@ -138,28 +134,36 @@ public class WeatherController {
             while (!Thread.currentThread().isInterrupted()) {
                 synchronized (sceneObjects) {
                     Iterator<SceneObject> it = sceneObjects.iterator();
-                    int i = 0;
-                    List<Double> newObjectZs = new ArrayList<>();
                     while (it.hasNext()) {
                         SceneObject next = it.next();
 
                         double width = sceneBounds != null ? (double) next.widthPixels / sceneBounds.width : 0;
                         double height = sceneBounds != null ? (double) next.heightPixels / sceneBounds.height : 0;
 
-                        boolean isObjectOutsideScene = next.x - width/2 > 1.0 || next.y - height/2 > 1.0;
+                        boolean isObjectOutsideScene = next.x - width / 2 > 1.0 || next.y - height / 2 > 1.0;
                         if (isObjectOutsideScene) {
                             it.remove();
-                            newObjectZs.add(next.z);
                         }
-                        i++;
                     }
-                    for (Double z : newObjectZs) {
-                        sceneObjects.add(createRandomSceneObject(z));
-                        Thread.yield();
-                    }
-                    updateSceneObjectsCopy();
+                    addMissingSceneObjects();
                 }
             }
         }
+    }
+
+    private void addMissingSceneObjects() {
+        synchronized (sceneObjects) {
+            while (sceneObjects.size() < objectCount) {
+                sceneObjects.add(createRandomSceneObject(Math.random()));
+//                        Thread.yield();
+            }
+            Collections.sort(sceneObjects, new Comparator<SceneObject>() {
+                @Override
+                public int compare(SceneObject o1, SceneObject o2) {
+                    return (int) (o1.z - o2.z);
+                }
+            });
+        }
+        updateSceneObjectsCopy();
     }
 }
