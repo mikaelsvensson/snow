@@ -64,7 +64,7 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
     }
 
     private void drawHelp(Graphics2D g2d) {
-        int y = 20;
+        int y = 0;
 
         g2d.setColor(Color.red);
 
@@ -75,13 +75,20 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
             fps = (int) (1000.0 / delay);
         }
         lastTime = now;
-        g2d.drawString(getName() + ": " + String.valueOf(fps) + " fps", 10, y);
+
+        drawKeyValueString(g2d, y += 20, "Fönster", getName());
+        drawKeyValueString(g2d, y += 20, "FPS", String.valueOf(fps));
+        drawKeyValueString(g2d, y += 20, "Antal objekt", String.valueOf(WeatherController.getInstance().getSceneObjects().length));
 
         for (KeyStroke key : getInputMap().keys()) {
-            y += 20;
-            g2d.drawString(KeyEvent.getKeyText(key.getKeyCode()), 10, y);
-            g2d.drawString(getActionMap().get(getInputMap().get(key)).getValue(Action.NAME).toString(), 100, y);
+            drawKeyValueString(g2d, y += 20, KeyEvent.getKeyText(key.getKeyCode()), getActionMap().get(getInputMap().get(key)).getValue(Action.NAME).toString());
         }
+
+    }
+
+    private void drawKeyValueString(Graphics2D g2d, int y, String key, String value) {
+        g2d.drawString(key, 10, y);
+        g2d.drawString(value, 100, y);
     }
 
     private void onWindowGeometryChange() {
