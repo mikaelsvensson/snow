@@ -112,21 +112,4 @@ class WeatherFrame extends JFrame {
             sceneRegionPanel.setRegion(region);
         }
     }
-
-/*
-    private GraphicsDevice getGraphicsDevice() {
-        GraphicsConfiguration curConf = getGraphicsConfiguration();
-        GraphicsDevice device = null;
-        for (GraphicsDevice graphicsDevice : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
-            for (GraphicsConfiguration conf : graphicsDevice.getConfigurations()) {
-                if (conf.equals(curConf)) {
-                    device = graphicsDevice;
-                    break;
-                }
-            }
-        }
-        return device;
-    }
-*/
-
 }
