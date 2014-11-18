@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WindowController {
-    private int windowCount;
     private static WindowController instance;
     private List<WeatherFrame> windows = new ArrayList<>();
 
@@ -26,19 +25,19 @@ public class WindowController {
     }
 
     synchronized void showNewWindow(int x, int y, int width, int height, String name) {
-        windowCount++;
-
         final WeatherFrame frame = new WeatherFrame();
-        frame.setName(name != null ? name : "Window " + windowCount);
+        frame.setName(name != null ? name : "Window " + windows.size());
         frame.setLocation(x, y);
         frame.setSize(width, height);
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                windowCount--;
-                if (windowCount < 1) {
+                windows.remove(frame);
+                if (windows.size() < 1) {
                     WeatherController.getInstance().stop();
+                } else {
+                    recalculateSceneObjects();
                 }
             }
         });
@@ -48,14 +47,6 @@ public class WindowController {
                 recalculateSceneObjects();
             }
 
-            private void recalculateSceneObjects() {
-                Rectangle sceneBounds = getSceneBounds();
-                WeatherController.getInstance().setSceneBounds(sceneBounds);
-                for (WeatherFrame window : windows) {
-                    window.recalibratePanel(sceneBounds);
-                }
-            }
-
             @Override
             public void componentResized(ComponentEvent e) {
                 recalculateSceneObjects();
@@ -63,6 +54,14 @@ public class WindowController {
         });
         initDrawWindowSupport(frame);
         windows.add(frame);
+    }
+
+    private void recalculateSceneObjects() {
+        Rectangle sceneBounds = getSceneBounds();
+        WeatherController.getInstance().setSceneBounds(sceneBounds);
+        for (WeatherFrame window : windows) {
+            window.recalibratePanel(sceneBounds);
+        }
     }
 
     private Rectangle getSceneBounds() {
