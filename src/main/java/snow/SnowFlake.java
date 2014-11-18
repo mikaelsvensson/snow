@@ -19,14 +19,14 @@ public class SnowFlake extends FallingSceneObject {
         BufferedImage img = createEmptyImage(requestedWidthPixels, requestedHeightPixels);
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        double baseLength = random(0.2, 1.0);
-        int thickness = 1 + (int) (random(0.05, 0.1) * requestedWidthPixels * baseLength);
+        double baseLength = Util.random(0.2, 1.0);
+        int thickness = 1 + (int) (Util.random(0.05, 0.1) * requestedWidthPixels * baseLength);
         g.setColor(WHITE);
         int length = (int) (baseLength * requestedHeightPixels / 2);
         int numberOfBranches = length / thickness / 2;
         int[] branchPositions = new int[numberOfBranches];
         for (int i = 0; i < branchPositions.length; i++) {
-            branchPositions[i] = (int) (random(0.1, 0.8) * length);
+            branchPositions[i] = (int) (Util.random(0.1, 0.8) * length);
         }
         int centerX = requestedWidthPixels / 2;
         int centerY = requestedHeightPixels / 2;
@@ -41,10 +41,6 @@ public class SnowFlake extends FallingSceneObject {
             }
         }
         return img;
-    }
-
-    private double random(double min, double max) {
-        return min + Math.random() * (max - min);
     }
 
     public static void main(final String[] args) {

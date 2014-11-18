@@ -61,8 +61,8 @@ public class WeatherController {
         SceneObject obj;
         if (v < 0.1) {
             obj = new DayBubble(100, 100, z, sceneBounds);
-        } else if (v < 0.15) {
-            obj = new Cloud(300, 300, z, sceneBounds);
+//        } else if (v < 0.15) {
+//            obj = new Cloud(300, 300, z, sceneBounds);
         } else {
             obj = new SnowFlake(snowflakeWidth, snowflakeHeight, z, sceneBounds);
         }
@@ -166,7 +166,7 @@ public class WeatherController {
 
     private class ImageFolderMonitorRunnable implements Runnable {
 
-        private List<File> filesThen = Collections.emptyList();
+        private List<File> filesThen = null;
 
         @Override
         public void run() {
@@ -182,24 +182,22 @@ public class WeatherController {
                     }
                 }));
 
-                for (final File file : filesNow) {
-                    if (!filesThen.contains(file)) {
-                        // New file
-                        try {
-                            final BufferedImage bufferedImage = ImageIO.read(file);
-                            synchronized (sceneObjects) {
-                                sceneObjects.add(new Cloud(bufferedImage.getWidth(), bufferedImage.getHeight(), Math.random(), sceneBounds) {
-                                    @Override
-                                    protected BufferedImage createImage(int requestedWidthPixels, int requestedHeightPixels) {
-                                        return bufferedImage;
-                                    }
-                                });
-                                sortSceneObjectByZ();
+                if (filesThen != null) {
+                    for (final File file : filesNow) {
+                        if (!filesThen.contains(file)) {
+                            // New file
+                            try {
+                                final BufferedImage bufferedImage = ImageIO.read(file);
+                                synchronized (sceneObjects) {
+                                    sceneObjects.add(new PhotoSceneObject(bufferedImage, sceneBounds));
+                                    sortSceneObjectByZ();
+                                }
+                                updateSceneObjectsCopy();
+                                Thread.yield();
+                            } catch (IOException e) {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                             }
-                            updateSceneObjectsCopy();
-                            Thread.yield();
-                        } catch (IOException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            break; // Only load the first new image each second
                         }
                     }
                 }
@@ -207,7 +205,7 @@ public class WeatherController {
                 filesThen = filesNow;
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1000); // Sleep for a second
                 } catch (InterruptedException e) {
                 }
             }
@@ -233,4 +231,5 @@ public class WeatherController {
             }
         });
     }
+
 }

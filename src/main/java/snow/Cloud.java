@@ -4,8 +4,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
-public class Cloud extends SceneObject {
-    private static final double MINIMUM_SECONDS_FOR_FALL = 10;
+public class Cloud extends PanningSceneObject {
     private static final int BLUR_MARGIN = 25;
     private static final int CLOUD_CIRCLE_DIAMETER = 100;
 
@@ -29,12 +28,4 @@ public class Cloud extends SceneObject {
         return img;
     }
 
-    @Override
-    public void update(long msSinceLastUpdate, Rectangle sceneBounds) {
-        double changePerMillisecond = speed / MINIMUM_SECONDS_FOR_FALL / 1000;
-        double delta = msSinceLastUpdate * changePerMillisecond;
-        double width = sceneBounds != null ? (double) widthPixels / sceneBounds.width : 0;
-
-        x += delta;
-    }
 }
