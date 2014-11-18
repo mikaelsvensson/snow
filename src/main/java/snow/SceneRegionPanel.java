@@ -61,6 +61,8 @@ public class SceneRegionPanel extends JPanel implements WeatherController.Listen
         if (System.currentTimeMillis() - lastKeyPressTimeStamp < HIDE_HELP_DELAY) {
             drawHelp(g2d);
         }
+
+        g2d.dispose();
     }
 
     private void drawHelp(Graphics2D g2d) {
