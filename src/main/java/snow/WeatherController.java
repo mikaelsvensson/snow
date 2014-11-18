@@ -16,6 +16,12 @@ public class WeatherController {
     private Thread cleanUpThread;
     private Thread imageFolderMonitorThread;
 
+    public void changeFallingObjectSlowness(int delta) {
+        synchronized (sceneObjects) {
+            FallingSceneObject.changeSlowness(delta);
+        }
+    }
+
     public static interface Listener {
         void onSceneChange();
     }
