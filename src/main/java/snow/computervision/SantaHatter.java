@@ -50,7 +50,6 @@ public class SantaHatter implements ImageAnalyzer {
         history[historyPos] = rects;
         if (rects.length >= 1) {
             fireFaceDetected();
-            System.out.println(history[historyPos].length + " faces detected");
 
             faceStatus = FaceStatus.YES_STATIC;
             for (int i = 0; i < history.length; i++) {

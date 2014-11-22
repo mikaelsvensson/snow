@@ -3,7 +3,10 @@ package snow;
 import snow.computervision.ComputerVision;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,6 @@ public class WindowController {
                 recalculateSceneObjects();
             }
         });
-        initDrawWindowSupport(frame);
         windows.add(frame);
     }
 
@@ -78,35 +80,6 @@ public class WindowController {
             }
         }
         return bounds.getBounds();
-    }
-
-    private Point mouseDownCompCoords;
-
-    /**
-     * Thanks to http://stackoverflow.com/a/16046943
-     *
-     * @param frame
-     */
-    private void initDrawWindowSupport(final WeatherFrame frame) {
-        frame.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                mouseDownCompCoords = e.getPoint();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                mouseDownCompCoords = null;
-            }
-        });
-
-        frame.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Point currCoords = e.getLocationOnScreen();
-                frame.setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
-            }
-        });
     }
 
 }

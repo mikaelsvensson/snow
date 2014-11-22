@@ -116,7 +116,6 @@ public class ComputerVision {
                 }
                 while (!Thread.currentThread().isInterrupted()) {
                     webCam.read(webcamImage);
-                    System.out.println("New image grabbed from webcam");
                     if (!webcamImage.empty()) {
                         try {
                             for (ImageAnalyzer imageAnalyzer : imageAnalyzers) {

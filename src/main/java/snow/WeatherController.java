@@ -1,7 +1,6 @@
 package snow;
 
 import snow.computervision.ComputerVision;
-import snow.computervision.ImageMatrixView;
 import snow.computervision.SantaHatter;
 
 import javax.imageio.ImageIO;
@@ -68,11 +67,9 @@ public class WeatherController {
 
         ComputerVision.getInstance().start();
 
-        final ImageMatrixView facePanel = new ImageMatrixView();
-        JFrame frame = new JFrame("Face Detection in Web Cam");
+        final PhotoboothFrame frame = new PhotoboothFrame();
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.setSize(700, 500);
-        frame.add(facePanel);
+        frame.setSize(1000, 500);
         frame.setVisible(true);
 
         SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath")) {
@@ -87,21 +84,19 @@ public class WeatherController {
 
             @Override
             public void onFaceDetected() {
-                System.out.println("Face detected");
             }
 
             @Override
             public void onStaticFaceDetected() {
-                System.out.println("Face is not moving");
             }
 
             @Override
             public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image) {
                 if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    facePanel.setMessage("Hi there.", "Too shy to come", "up to the camera?");
+                    frame.updateView(image, "Hi there.", "Too shy to come", "up to the camera?");
                 } else {
                     if (faceStatus == SantaHatter.FaceStatus.YES_STATIC && System.currentTimeMillis() - lastUpdate > 5000) {
-                        facePanel.setMessage("*click*", "Thank you.");
+                        frame.updateView(image, "*click*", "Thank you.");
                         synchronized (sceneObjects) {
                             sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
                             sortSceneObjectByZ();
@@ -109,10 +104,9 @@ public class WeatherController {
                         updateSceneObjectsCopy();
                         lastUpdate = System.currentTimeMillis();
                     } else {
-                        facePanel.setMessage("Hold it...");
+                        frame.updateView(image, "Hold it...");
                     }
                 }
-                facePanel.setImage(image);
             }
         });
         ComputerVision.getInstance().addImageAnalyser(santaHatter);

@@ -6,11 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 
-class WeatherFrame extends JFrame {
+class WeatherFrame extends SlimFrame {
     private final SceneRegionPanel sceneRegionPanel;
 
     public WeatherFrame() throws HeadlessException {
-        setUndecorated(true);
         sceneRegionPanel = new SceneRegionPanel();
         sceneRegionPanel.setPreferredSize(new Dimension(600, 600));
         setContentPane(sceneRegionPanel);
@@ -91,10 +90,6 @@ class WeatherFrame extends JFrame {
     public void setName(String name) {
         super.setName(name);
         sceneRegionPanel.setName(name);
-    }
-
-    void moveFrame(int deltaX, int deltaY) {
-        setLocation(getLocation().x + deltaX, getLocation().y + deltaY);
     }
 
     void recalibratePanel(Rectangle sceneBounds) {
