@@ -1,5 +1,7 @@
 package snow;
 
+import snow.computervision.ComputerVision;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -36,6 +38,7 @@ public class WindowController {
                 windows.remove(frame);
                 if (windows.size() < 1) {
                     WeatherController.getInstance().stop();
+                    ComputerVision.getInstance().stop();
                 } else {
                     recalculateSceneObjects();
                 }

@@ -1,6 +1,11 @@
 package snow;
 
+import snow.computervision.ComputerVision;
+import snow.computervision.ImageMatrixView;
+import snow.computervision.SantaHatter;
+
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -60,6 +65,57 @@ public class WeatherController {
         imageFolderMonitorThread = new Thread(new ImageFolderMonitorRunnable());
         imageFolderMonitorThread.setPriority(Thread.MIN_PRIORITY);
         imageFolderMonitorThread.start();
+
+        ComputerVision.getInstance().start();
+
+        final ImageMatrixView facePanel = new ImageMatrixView();
+        JFrame frame = new JFrame("Face Detection in Web Cam");
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        frame.setSize(700, 500);
+        frame.add(facePanel);
+        frame.setVisible(true);
+
+        SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath")) {
+
+            @Override
+            public void postProcess(BufferedImage image) {
+                super.postProcess(image);
+            }
+        };
+        santaHatter.addListener(new SantaHatter.Listener() {
+            public long lastUpdate = System.currentTimeMillis();
+
+            @Override
+            public void onFaceDetected() {
+                System.out.println("Face detected");
+            }
+
+            @Override
+            public void onStaticFaceDetected() {
+                System.out.println("Face is not moving");
+            }
+
+            @Override
+            public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image) {
+                if (faceStatus == SantaHatter.FaceStatus.NO) {
+                    facePanel.setMessage("Hi there.", "Too shy to come", "up to the camera?");
+                } else {
+                    if (faceStatus == SantaHatter.FaceStatus.YES_STATIC && System.currentTimeMillis() - lastUpdate > 5000) {
+                        facePanel.setMessage("*click*", "Thank you.");
+                        synchronized (sceneObjects) {
+                            sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
+                            sortSceneObjectByZ();
+                        }
+                        updateSceneObjectsCopy();
+                        lastUpdate = System.currentTimeMillis();
+                    } else {
+                        facePanel.setMessage("Hold it...");
+                    }
+                }
+                facePanel.setImage(image);
+            }
+        });
+        ComputerVision.getInstance().addImageAnalyser(santaHatter);
     }
 
     private SceneObject createRandomSceneObject(double z) {
