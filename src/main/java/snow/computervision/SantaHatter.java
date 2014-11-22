@@ -34,7 +34,7 @@ public class SantaHatter implements ImageAnalyzer {
 
     public SantaHatter(String faceDetectionConfigurationFilePath) {
         try {
-            santaHatImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("tomteluva.png"));
+            santaHatImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("santa_hat.png"));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
