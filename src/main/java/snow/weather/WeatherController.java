@@ -1,4 +1,6 @@
-package snow;
+package snow.weather;
+
+import snow.Util;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

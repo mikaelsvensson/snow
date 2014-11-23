@@ -1,4 +1,6 @@
-package snow;
+package snow.weather;
+
+import snow.SlimFrame;
 
 import javax.swing.*;
 import java.awt.*;

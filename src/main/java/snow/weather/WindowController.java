@@ -1,4 +1,4 @@
-package snow;
+package snow.weather;
 
 import snow.computervision.ComputerVision;
 

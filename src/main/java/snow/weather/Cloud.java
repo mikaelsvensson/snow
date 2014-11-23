@@ -1,4 +1,4 @@
-package snow;
+package snow.weather;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
