@@ -41,11 +41,11 @@ public class ImageMatrixView extends JPanel {
         if (buf != null) {
             paintImage(g2d);
         }
-        if (message != null) {
-            paintMessage(g2d);
-        }
         if (waitProgress >= 0.1) {
             paintWaitProgressClock(g2d);
+        }
+        if (message != null) {
+            paintMessage(g2d);
         }
     }
 
