@@ -38,7 +38,7 @@ public class SlimFrame extends JFrame {
         });
     }
 
-    void moveFrame(int deltaX, int deltaY) {
+    protected void moveFrame(int deltaX, int deltaY) {
         setLocation(getLocation().x + deltaX, getLocation().y + deltaY);
     }
 }
