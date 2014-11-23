@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class PhotoboothApplication implements Runnable {
 
@@ -56,11 +55,9 @@ public class PhotoboothApplication implements Runnable {
 
                         try (
                                 Socket socket = new Socket(Util.getServerHost(), Util.getServerPort());
-                                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
                         ) {
                             ImageIO.write(image, "png", out);
-                        } catch (UnknownHostException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         } catch (IOException e) {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         } finally {

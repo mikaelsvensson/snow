@@ -19,7 +19,7 @@ public class ServerRunnable implements Runnable {
     @Override
     public void run() {
         try (
-                ServerSocket socket = new ServerSocket(Util.getServerPort());
+                ServerSocket socket = new ServerSocket(Util.getServerPort())
         ) {
             while (!Thread.interrupted()) {
                 executor.execute(new ClientRequestHandler(socket.accept()));

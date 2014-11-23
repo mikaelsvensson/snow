@@ -5,7 +5,7 @@ import snow.computervision.ImageMatrixView;
 
 import java.awt.image.BufferedImage;
 
-public class PhotoboothFrame extends SlimFrame {
+class PhotoboothFrame extends SlimFrame {
 
     private final ImageMatrixView facePanel;
 

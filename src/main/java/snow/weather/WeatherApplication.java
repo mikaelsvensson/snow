@@ -7,9 +7,9 @@ import java.awt.*;
  * Hello world!
  */
 public class WeatherApplication implements Runnable {
-    private Rectangle[] startUpWindowBounds;
+    private final Rectangle[] startUpWindowBounds;
 
-    public WeatherApplication(Rectangle... startUpWindowBounds) {
+    private WeatherApplication(Rectangle... startUpWindowBounds) {
         this.startUpWindowBounds = startUpWindowBounds;
     }
 
@@ -47,8 +47,8 @@ public class WeatherApplication implements Runnable {
                     arg.x,
                     arg.y,
                     arg.width,
-                    arg.height,
-                    null);
+                    arg.height
+            );
         }
     }
 }

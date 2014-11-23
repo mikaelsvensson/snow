@@ -34,7 +34,7 @@ public class WeatherController {
     private WeatherController() {
     }
 
-    private Collection<Listener> listeners = new ArrayList<>();
+    private final Collection<Listener> listeners = new ArrayList<>();
 
     public synchronized void addListener(Listener listener) {
         listeners.add(listener);
@@ -48,13 +48,11 @@ public class WeatherController {
         objectCount = Math.max(0, objectCount + delta);
     }
 
-    private List<SceneObject> sceneObjects = new ArrayList<>();
+    private final List<SceneObject> sceneObjects = new ArrayList<>();
     private SceneObject[] sceneObjectsCopy = null;
     private Thread thread;
-    private final int snowflakeWidth = 200;
-    private final int snowflakeHeight = 200;
 
-    public void start() {
+    void start() {
         stop();
         addMissingSceneObjects();
         thread = new Thread(new ObjectUpdaterRunnable());
@@ -130,6 +128,8 @@ public class WeatherController {
 //        } else if (v < 0.15) {
 //            obj = new Cloud(300, 300, z, sceneBounds);
         } else {
+            int snowflakeHeight = 200;
+            int snowflakeWidth = 200;
             obj = new SnowFlake(snowflakeWidth, snowflakeHeight, z, sceneBounds);
         }
         return obj;

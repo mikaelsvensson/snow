@@ -48,7 +48,7 @@ class WeatherFrame extends SlimFrame {
         registerAction(KeyEvent.VK_INSERT, new AbstractAction("Klona fönster") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                WindowController.getInstance().showNewWindow(getX() + 10, getY() + 10, getWidth(), getHeight(), null);
+                WindowController.getInstance().showNewWindow(getX() + 10, getY() + 10, getWidth(), getHeight());
             }
         });
         registerAction(KeyEvent.VK_PAGE_UP, new AbstractAction("Fler objekt") {

@@ -27,7 +27,7 @@ public class ComputerVision {
     private static ComputerVision instance = null;
     private Thread imageProviderThread;
     private ImageProvider imageProvider;
-    private List<Listener> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
 
     private ComputerVision() {
     }
@@ -47,7 +47,7 @@ public class ComputerVision {
         getImageProvider().addImageAnalyser(imageAnalyzer);
     }
 
-    public void addListener(Listener listener) {
+    void addListener(Listener listener) {
         listeners.add(listener);
     }
 
@@ -101,7 +101,7 @@ public class ComputerVision {
     }
 
     private class ImageProvider implements Runnable {
-        private List<ImageAnalyzer> imageAnalyzers = new ArrayList<>();
+        private final List<ImageAnalyzer> imageAnalyzers = new ArrayList<>();
 
         @Override
         public void run() {

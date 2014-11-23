@@ -19,7 +19,7 @@ public class SantaHatter implements ImageAnalyzer {
 
     private static final int NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR = 5;
     private final CascadeClassifier detector;
-    private Rect[][] history = new Rect[NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR][];
+    private final Rect[][] history = new Rect[NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR][];
     private int historyPos = 0;
     private BufferedImage santaHatImage;
     private FaceStatus faceStatus;
@@ -30,7 +30,7 @@ public class SantaHatter implements ImageAnalyzer {
         YES_STATIC
     }
 
-    private List<Listener> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
 
     public SantaHatter(String faceDetectionConfigurationFilePath) {
         try {
@@ -90,7 +90,7 @@ public class SantaHatter implements ImageAnalyzer {
         return maxRect;
     }
 
-    public Rect[] detectRects(Mat image) {
+    Rect[] detectRects(Mat image) {
         Mat grey = new Mat();
 //            Mat rgba = new Mat();
 //            image.copyTo(rgba);
@@ -101,7 +101,6 @@ public class SantaHatter implements ImageAnalyzer {
 
         MatOfRect faces = new MatOfRect();
         detector.detectMultiScale(grey, faces);
-        int i = 1;
         return faces.toArray();
     }
 

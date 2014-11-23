@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 public class SlimFrame extends JFrame {
     private Point mouseDownCompCoords;
 
-    public SlimFrame() throws HeadlessException {
+    protected SlimFrame() throws HeadlessException {
         setUndecorated(true);
         initDragWindowSupport();
     }
@@ -16,7 +16,7 @@ public class SlimFrame extends JFrame {
     /**
      * Thanks to http://stackoverflow.com/a/16046943
      */
-    protected void initDragWindowSupport() {
+    void initDragWindowSupport() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {

@@ -14,7 +14,7 @@ import java.util.List;
 // TODO: Merge with snow.weather.WeatherApplication?
 public class WindowController {
     private static WindowController instance;
-    private List<WeatherFrame> windows = new ArrayList<>();
+    private final List<WeatherFrame> windows = new ArrayList<>();
 
     private WindowController() {
     }
@@ -30,9 +30,9 @@ public class WindowController {
         return instance;
     }
 
-    synchronized void showNewWindow(int x, int y, int width, int height, String name) {
+    synchronized void showNewWindow(int x, int y, int width, int height) {
         final WeatherFrame frame = new WeatherFrame();
-        frame.setName(name != null ? name : "Window " + windows.size());
+        frame.setName("Window " + windows.size());
         frame.setLocation(x, y);
         frame.setSize(width, height);
         frame.setVisible(true);

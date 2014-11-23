@@ -11,8 +11,8 @@ public abstract class SceneObject {
     public double rotation;
     double x;
     double y;
-    double z;
-    double speed;
+    final double z;
+    final double speed;
     int widthPixels;
     int heightPixels;
 
@@ -23,7 +23,7 @@ public abstract class SceneObject {
      * @param y            The distance from point-of-view (the user) to the object. 0 = right in the front, 1 = as far away as possible.
      * @param z
      */
-    public SceneObject(int widthPixels, int heightPixels, double x, double y, double z) {
+    SceneObject(int widthPixels, int heightPixels, double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -40,7 +40,7 @@ public abstract class SceneObject {
      * @param heightPixels
      * @param z
      */
-    public void init(int widthPixels, int heightPixels, double z) {
+    void init(int widthPixels, int heightPixels, double z) {
         this.image = createBlurredImage(createImage((int) (widthPixels * (1.0 - Math.min(z, 0.1))), (int) (heightPixels * (1.0 - Math.min(z, 0.1)))), z);
         this.widthPixels = image.getWidth();
         this.heightPixels = image.getHeight();
@@ -49,14 +49,14 @@ public abstract class SceneObject {
     /**
      * Filters from http://www.jhlabs.com/ip/index.html
      */
-    protected BufferedImage createBlurredImage(BufferedImage img, double blur) {
+    BufferedImage createBlurredImage(BufferedImage img, double blur) {
         BufferedImageOp op;
 //        op = new BoxBlurFilter(5, 5, 3);
         op = new GaussianFilter((float) (blur * 25));
         return op.filter(img, null);
     }
 
-    protected BufferedImage createEmptyImage(int width, int height) {
+    BufferedImage createEmptyImage(int width, int height) {
         return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
     }
 }
