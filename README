@@ -5,5 +5,5 @@ viewports (windows!) to that scene. This means that snowflakes may fall from
 one window to another.
 
     $ java -cp target\snow-1.0-SNAPSHOT-jar-with-dependencies.jar \
-    -Djava.library.path=./lib/opencv/x64 \
+    -Djava.library.path=%ABSOLUTE_PROJECT_PATH%/lib/opencv/x64 \
     -DfaceDetectionConfigurationFilePath=./src/main/resources/haarcascade_frontalface_alt.xml snow.weather.WeatherApplication 100,100,1800,900
