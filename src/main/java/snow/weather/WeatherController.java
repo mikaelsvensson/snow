@@ -20,6 +20,7 @@ public class WeatherController {
 
     // TODO: Move serverThread to snow.weather.WeatherApplication?
     private Thread serverThread;
+    private ServerRunnable serverRunnable;
 
     public void changeFallingObjectSlowness(int delta) {
         synchronized (sceneObjects) {
@@ -64,7 +65,8 @@ public class WeatherController {
         imageFolderMonitorThread.setPriority(Thread.MIN_PRIORITY);
         imageFolderMonitorThread.start();
 
-        serverThread = new Thread(new ServerRunnable());
+        serverRunnable = new ServerRunnable();
+        serverThread = new Thread(serverRunnable);
         serverThread.start();
 
 /*
@@ -146,6 +148,7 @@ public class WeatherController {
             stopThread(thread);
         }
         if (serverThread != null) {
+            serverRunnable.stop();
             stopThread(serverThread);
         }
         if (cleanUpThread != null) {
@@ -159,7 +162,7 @@ public class WeatherController {
     private void stopThread(Thread t) {
         t.interrupt();
         try {
-            t.join();
+            t.join(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -278,6 +281,7 @@ public class WeatherController {
                 try {
                     Thread.sleep(1000); // Sleep for a second
                 } catch (InterruptedException e) {
+                    break;
                 }
             }
         }

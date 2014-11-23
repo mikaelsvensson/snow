@@ -92,11 +92,13 @@ public class ComputerVision {
     }
 
     public void stop() {
-        imageProviderThread.interrupt();
-        try {
-            imageProviderThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        if (imageProviderThread != null) {
+            imageProviderThread.interrupt();
+            try {
+                imageProviderThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
     }
 

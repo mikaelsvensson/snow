@@ -1,7 +1,5 @@
 package snow.weather;
 
-import snow.computervision.ComputerVision;
-
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -42,7 +40,7 @@ public class WindowController {
                 windows.remove(frame);
                 if (windows.size() < 1) {
                     WeatherController.getInstance().stop();
-                    ComputerVision.getInstance().stop();
+
                 } else {
                     recalculateSceneObjects();
                 }

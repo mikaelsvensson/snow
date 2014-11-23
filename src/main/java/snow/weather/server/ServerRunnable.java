@@ -4,6 +4,7 @@ import snow.Util;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class ServerRunnable implements Runnable {
 
     private final ExecutorService executor;
+    private ServerSocket serverSocket;
 
     public ServerRunnable() {
         executor = Executors.newFixedThreadPool(2);
@@ -18,12 +20,17 @@ public class ServerRunnable implements Runnable {
 
     @Override
     public void run() {
-        try (
-                ServerSocket socket = new ServerSocket(Util.getServerPort())
-        ) {
-            while (!Thread.interrupted()) {
-                executor.execute(new ClientRequestHandler(socket.accept()));
+        try {
+            serverSocket = new ServerSocket(Util.getServerPort());
+            try (
+                    ServerSocket socket = serverSocket
+            ) {
+                while (!Thread.currentThread().isInterrupted()) {
+                    executor.execute(new ClientRequestHandler(socket.accept()));
+                }
             }
+        } catch (SocketException e) {
+            System.err.println(e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } finally {
@@ -46,6 +53,16 @@ public class ServerRunnable implements Runnable {
             executor.shutdownNow();
             // Preserve interrupt status
             Thread.currentThread().interrupt();
+        }
+    }
+
+    public void stop() {
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
     }
 }
