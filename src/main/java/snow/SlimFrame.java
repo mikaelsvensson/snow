@@ -27,6 +27,13 @@ public class SlimFrame extends JFrame {
             public void mouseReleased(MouseEvent e) {
                 mouseDownCompCoords = null;
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    setExtendedState(getExtendedState() == NORMAL ? MAXIMIZED_BOTH : NORMAL);
+                }
+            }
         });
 
         addMouseMotionListener(new MouseAdapter() {
