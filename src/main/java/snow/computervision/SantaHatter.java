@@ -17,10 +17,9 @@ import java.util.List;
 
 public class SantaHatter implements ImageAnalyzer {
 
-    private static final int NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR = 5;
+    private static final int NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR = 1;
     private final CascadeClassifier detector;
-    private final Rect[][] history = new Rect[NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR][];
-    private int historyPos = 0;
+    private Rect[] lastFrameRects = null;
     private BufferedImage santaHatImage;
     private FaceStatus faceStatus;
     private long smallFaceMovementsSince = -1;
@@ -48,32 +47,36 @@ public class SantaHatter implements ImageAnalyzer {
     @Override
     public void process(Mat image) {
         Rect[] rects = detectRects(image);
-        history[historyPos] = rects;
-        if (rects.length >= 1) {
+        Rect currentFaceRect = getLargest(rects);
+        boolean isCurrentFaceBig = currentFaceRect != null && (1.0 * currentFaceRect.height / image.height()) > 0.2;
+        if (isCurrentFaceBig) {
             fireFaceDetected();
 
-            faceStatus = FaceStatus.YES_STATIC;
-            for (int i = 0; i < history.length; i++) {
-                Rect[] histRects = history[(historyPos + i) % history.length];
-                Rect[] prevHistRects = history[(historyPos + i - 1 + history.length) % history.length];
-                Rect histRect = getLargest(histRects);
-                Rect prevHistRect = getLargest(prevHistRects);
-                if (histRect != null && prevHistRect != null) {
-                    int avgWidth = histRect.width / 2 + prevHistRect.width / 2;
-                    int avgHeight = histRect.height / 2 + prevHistRect.height / 2;
-                    if (1.0 * Math.abs(histRect.x - prevHistRect.x) / avgWidth >= 0.1 || 1.0 * Math.abs(histRect.y - prevHistRect.y) / avgHeight >= 0.1) {
-                        faceStatus = FaceStatus.YES_MOVING;
-                        smallFaceMovementsSince = System.currentTimeMillis();
-                    } else {
-                        // Only small movement since last analyzed frame
-                    }
-                } else {
+            Rect previousFaceRect = getLargest(lastFrameRects);
+            boolean isPreviousFaceBig = previousFaceRect != null && (1.0 * previousFaceRect.height / image.height()) > 0.2;
+            if (isPreviousFaceBig) {
+                int avgWidth = currentFaceRect.width / 2 + previousFaceRect.width / 2;
+                int avgHeight = currentFaceRect.height / 2 + previousFaceRect.height / 2;
+                boolean isFaceMovedX = 1.0 * Math.abs(currentFaceRect.x - previousFaceRect.x) / avgWidth >= 0.1;
+                boolean isFaceMovedY = 1.0 * Math.abs(currentFaceRect.y - previousFaceRect.y) / avgHeight >= 0.1;
+                if (isPreviousFaceBig && (isFaceMovedX || isFaceMovedY)) {
                     faceStatus = FaceStatus.YES_MOVING;
+                    smallFaceMovementsSince = System.currentTimeMillis();
+                } else {
+                    // Only small movement since last analyzed frame
+                    faceStatus = FaceStatus.YES_STATIC;
                 }
+            } else {
+                // The last detected face was quite small but the currently detected face is large, so the face is moving away from or towards the camera.
+                faceStatus = FaceStatus.YES_MOVING;
+                smallFaceMovementsSince = System.currentTimeMillis();
             }
+
+            lastFrameRects = rects;
         } else {
             faceStatus = FaceStatus.NO;
             smallFaceMovementsSince = -1;
+            lastFrameRects = null;
         }
     }
 
@@ -111,8 +114,7 @@ public class SantaHatter implements ImageAnalyzer {
 
     @Override
     public void postProcess(BufferedImage image) {
-        Rect[] rects = history[historyPos];
-        Rect rect = getLargest(rects);
+        Rect rect = getLargest(lastFrameRects);
         if (rect != null) {
             Graphics2D g = image.createGraphics();
             g.setColor(Color.blue);
@@ -125,7 +127,6 @@ public class SantaHatter implements ImageAnalyzer {
             g.drawImage(santaHatImage, transform, null);
             g.dispose();
         }
-        historyPos = (historyPos + 1) % history.length;
 
         if (faceStatus == FaceStatus.YES_STATIC) {
             fireStaticDetected();
