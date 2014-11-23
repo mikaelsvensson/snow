@@ -1,17 +1,19 @@
 package snow;
 
-import snow.computervision.ComputerVision;
-import snow.computervision.SantaHatter;
-
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class WeatherController {
     private int objectCount = 50;
@@ -19,6 +21,7 @@ public class WeatherController {
     private Rectangle sceneBounds;
     private Thread cleanUpThread;
     private Thread imageFolderMonitorThread;
+    private Thread serverThread;
 
     public void changeFallingObjectSlowness(int delta) {
         synchronized (sceneObjects) {
@@ -65,6 +68,10 @@ public class WeatherController {
         imageFolderMonitorThread.setPriority(Thread.MIN_PRIORITY);
         imageFolderMonitorThread.start();
 
+        serverThread = new Thread(new ServerRunnable());
+        serverThread.start();
+
+/*
         ComputerVision.getInstance().start();
 
         final PhotoboothFrame frame = new PhotoboothFrame();
@@ -97,11 +104,7 @@ public class WeatherController {
                 } else {
                     if (faceStatus == SantaHatter.FaceStatus.YES_STATIC && System.currentTimeMillis() - lastUpdate > 5000) {
                         frame.updateView(image, "*click*", "Thank you.");
-                        synchronized (sceneObjects) {
-                            sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
-                            sortSceneObjectByZ();
-                        }
-                        updateSceneObjectsCopy();
+                        addSceneObject(image);
                         lastUpdate = System.currentTimeMillis();
                     } else {
                         frame.updateView(image, "Hold it...");
@@ -110,6 +113,15 @@ public class WeatherController {
             }
         });
         ComputerVision.getInstance().addImageAnalyser(santaHatter);
+*/
+    }
+
+    private void addSceneObject(BufferedImage image) {
+        synchronized (sceneObjects) {
+            sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
+            sortSceneObjectByZ();
+        }
+        updateSceneObjectsCopy();
     }
 
     private SceneObject createRandomSceneObject(double z) {
@@ -133,16 +145,25 @@ public class WeatherController {
 
     public void stop() {
         if (thread != null) {
-            thread.interrupt();
-            thread = null;
+            stopThread(thread);
+        }
+        if (serverThread != null) {
+            stopThread(serverThread);
         }
         if (cleanUpThread != null) {
-            cleanUpThread.interrupt();
-            thread = null;
+            stopThread(cleanUpThread);
         }
         if (imageFolderMonitorThread != null) {
-            imageFolderMonitorThread.interrupt();
-            thread = null;
+            stopThread(imageFolderMonitorThread);
+        }
+    }
+
+    private void stopThread(Thread t) {
+        t.interrupt();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -168,6 +189,48 @@ public class WeatherController {
             }
         }
         return instance;
+    }
+
+    private class ServerRunnable implements Runnable {
+
+        private final ExecutorService executor;
+
+        private ServerRunnable() {
+            executor = Executors.newFixedThreadPool(2);
+        }
+
+        @Override
+        public void run() {
+            try (
+                    ServerSocket socket = new ServerSocket(Util.getServerPort());
+            ) {
+                while (!Thread.interrupted()) {
+                    executor.execute(new ClientRequestHandler(socket.accept()));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } finally {
+                shutdownAndAwaitTermination();
+            }
+        }
+
+        void shutdownAndAwaitTermination() {
+            executor.shutdown(); // Disable new tasks from being submitted
+            try {
+                // Wait a while for existing tasks to terminate
+                if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                    executor.shutdownNow(); // Cancel currently executing tasks
+                    // Wait a while for tasks to respond to being cancelled
+                    if (!executor.awaitTermination(10, TimeUnit.SECONDS))
+                        System.err.println("Pool did not terminate");
+                }
+            } catch (InterruptedException ie) {
+                // (Re-)Cancel if current thread also interrupted
+                executor.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     private class ObjectUpdaterRunnable implements Runnable {
@@ -244,11 +307,7 @@ public class WeatherController {
                             // New file
                             try {
                                 final BufferedImage bufferedImage = ImageIO.read(file);
-                                synchronized (sceneObjects) {
-                                    sceneObjects.add(new PhotoSceneObject(bufferedImage, sceneBounds));
-                                    sortSceneObjectByZ();
-                                }
-                                updateSceneObjectsCopy();
+                                addSceneObject(bufferedImage);
                                 Thread.yield();
                             } catch (IOException e) {
                                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -288,4 +347,22 @@ public class WeatherController {
         });
     }
 
+    private class ClientRequestHandler implements Runnable {
+        private final Socket socket;
+
+        public ClientRequestHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                BufferedImage image = ImageIO.read(in);
+                addSceneObject(image);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+    }
 }
