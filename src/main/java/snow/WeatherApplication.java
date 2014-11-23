@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Hello world!
  */
-public class WinterWindows {
+public class WeatherApplication {
     public static void main(String[] args) {
         final String[] configurations;
         if (args.length == 1 && "fullscreen".equals(args[0])) {
