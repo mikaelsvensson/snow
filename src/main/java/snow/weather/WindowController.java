@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Merge with snow.weather.WeatherApplication?
 public class WindowController {
     private static WindowController instance;
     private List<WeatherFrame> windows = new ArrayList<>();

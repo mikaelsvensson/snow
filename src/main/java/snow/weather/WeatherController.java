@@ -1,6 +1,6 @@
 package snow.weather;
 
-import snow.Util;
+import snow.weather.server.ServerRunnable;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -8,14 +8,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class WeatherController {
     private int objectCount = 50;
@@ -23,6 +17,8 @@ public class WeatherController {
     private Rectangle sceneBounds;
     private Thread cleanUpThread;
     private Thread imageFolderMonitorThread;
+
+    // TODO: Move serverThread to snow.weather.WeatherApplication?
     private Thread serverThread;
 
     public void changeFallingObjectSlowness(int delta) {
@@ -118,7 +114,7 @@ public class WeatherController {
 */
     }
 
-    private void addSceneObject(BufferedImage image) {
+    public void addSceneObject(BufferedImage image) {
         synchronized (sceneObjects) {
             sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
             sortSceneObjectByZ();
@@ -191,48 +187,6 @@ public class WeatherController {
             }
         }
         return instance;
-    }
-
-    private class ServerRunnable implements Runnable {
-
-        private final ExecutorService executor;
-
-        private ServerRunnable() {
-            executor = Executors.newFixedThreadPool(2);
-        }
-
-        @Override
-        public void run() {
-            try (
-                    ServerSocket socket = new ServerSocket(Util.getServerPort());
-            ) {
-                while (!Thread.interrupted()) {
-                    executor.execute(new ClientRequestHandler(socket.accept()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } finally {
-                shutdownAndAwaitTermination();
-            }
-        }
-
-        void shutdownAndAwaitTermination() {
-            executor.shutdown(); // Disable new tasks from being submitted
-            try {
-                // Wait a while for existing tasks to terminate
-                if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
-                    executor.shutdownNow(); // Cancel currently executing tasks
-                    // Wait a while for tasks to respond to being cancelled
-                    if (!executor.awaitTermination(10, TimeUnit.SECONDS))
-                        System.err.println("Pool did not terminate");
-                }
-            } catch (InterruptedException ie) {
-                // (Re-)Cancel if current thread also interrupted
-                executor.shutdownNow();
-                // Preserve interrupt status
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 
     private class ObjectUpdaterRunnable implements Runnable {
@@ -349,22 +303,4 @@ public class WeatherController {
         });
     }
 
-    private class ClientRequestHandler implements Runnable {
-        private final Socket socket;
-
-        public ClientRequestHandler(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try {
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-                BufferedImage image = ImageIO.read(in);
-                addSceneObject(image);
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-    }
 }
