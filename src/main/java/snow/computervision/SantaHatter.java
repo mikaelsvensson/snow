@@ -23,6 +23,7 @@ public class SantaHatter implements ImageAnalyzer {
     private BufferedImage santaHatImage;
     private FaceStatus faceStatus;
     private long smallFaceMovementsSince = -1;
+    private boolean isFrameDrawnAroundFace;
 
     public static enum FaceStatus {
         NO,
@@ -32,7 +33,8 @@ public class SantaHatter implements ImageAnalyzer {
 
     private final List<Listener> listeners = new ArrayList<>();
 
-    public SantaHatter(String faceDetectionConfigurationFilePath) {
+    public SantaHatter(String faceDetectionConfigurationFilePath, boolean frameDrawnAroundFace) {
+        isFrameDrawnAroundFace = frameDrawnAroundFace;
         try {
             santaHatImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("santa_hat.png"));
         } catch (IOException e) {
@@ -117,8 +119,10 @@ public class SantaHatter implements ImageAnalyzer {
         Rect rect = getLargest(lastFrameRects);
         if (rect != null) {
             Graphics2D g = image.createGraphics();
-            g.setColor(Color.blue);
-            g.drawRect(rect.x, rect.y, rect.width, rect.height);
+            if (isFrameDrawnAroundFace) {
+                g.setColor(Color.blue);
+                g.drawRect(rect.x, rect.y, rect.width, rect.height);
+            }
             AffineTransform transform = new AffineTransform();
             double sx = 1.0 * (rect.width * 1.4) / santaHatImage.getWidth();
             double sy = 1.0 * rect.height / santaHatImage.getHeight();

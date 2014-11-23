@@ -69,7 +69,7 @@ public class ComputerVision {
         final ImageMatrixView facePanel = new ImageMatrixView();
 
         ComputerVision.getInstance().start();
-        ComputerVision.getInstance().addImageAnalyser(new SantaHatter("D:\\Dokument\\Utveckling\\snow\\src\\main\\resources\\haarcascade_frontalface_alt.xml"));
+        ComputerVision.getInstance().addImageAnalyser(new SantaHatter("D:\\Dokument\\Utveckling\\snow\\src\\main\\resources\\haarcascade_frontalface_alt.xml", true));
         ComputerVision.getInstance().addListener(new Listener() {
             @Override
             public void onImageUpdate(BufferedImage image) {

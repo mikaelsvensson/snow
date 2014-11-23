@@ -33,7 +33,7 @@ public class PhotoboothApplication implements Runnable {
             }
         });
 
-        SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath"));
+        SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath"), false);
         santaHatter.addListener(new SantaHatter.Listener() {
             public long lastUpdate = System.currentTimeMillis();
             public boolean currentFaceHasBeenSaved;
