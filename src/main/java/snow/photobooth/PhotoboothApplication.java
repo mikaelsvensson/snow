@@ -1,6 +1,5 @@
 package snow.photobooth;
 
-import snow.PhotoboothFrame;
 import snow.Util;
 import snow.computervision.ComputerVision;
 import snow.computervision.SantaHatter;

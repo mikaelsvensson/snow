@@ -1,5 +1,6 @@
-package snow;
+package snow.photobooth;
 
+import snow.SlimFrame;
 import snow.computervision.ImageMatrixView;
 
 import java.awt.image.BufferedImage;
