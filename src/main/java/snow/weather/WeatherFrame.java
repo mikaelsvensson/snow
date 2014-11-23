@@ -19,32 +19,6 @@ class WeatherFrame extends SlimFrame {
 
         pack();
 
-//        System.out.println(KeyEvent.getKeyText(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0).getKeyCode()));
-
-        registerAction(KeyEvent.VK_LEFT, new AbstractAction("Flytta fönster till vänster") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveFrame(-50, 0);
-            }
-        });
-        registerAction(KeyEvent.VK_RIGHT, new AbstractAction("Flytta fönster till höger") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveFrame(50, 0);
-            }
-        });
-        registerAction(KeyEvent.VK_UP, new AbstractAction("Flytta fönster uppåt") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveFrame(0, -50);
-            }
-        });
-        registerAction(KeyEvent.VK_DOWN, new AbstractAction("Flytta fönster nedåt") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveFrame(0, 50);
-            }
-        });
         registerAction(KeyEvent.VK_INSERT, new AbstractAction("Klona fönster") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -75,17 +49,6 @@ class WeatherFrame extends SlimFrame {
                 WeatherController.getInstance().changeFallingObjectSlowness(-1);
             }
         });
-        registerAction(KeyEvent.VK_ESCAPE, new AbstractAction("Stäng fönster") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-    }
-
-    private void registerAction(int keyCode, AbstractAction action) {
-        sceneRegionPanel.getInputMap().put(KeyStroke.getKeyStroke(keyCode, 0), action.getValue(Action.NAME));
-        sceneRegionPanel.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     @Override
