@@ -32,10 +32,10 @@ public class PhotoboothApplication implements Runnable {
                 computerVision.stop();
             }
         });
+        frame.setMessageVisible(!Boolean.valueOf(System.getProperty("hideMessage", Boolean.FALSE.toString())));
 
         SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath"), false);
         santaHatter.addListener(new SantaHatter.Listener() {
-            public long lastUpdate = System.currentTimeMillis();
             public boolean currentFaceHasBeenSaved;
 
             @Override

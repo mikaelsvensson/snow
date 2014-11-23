@@ -17,13 +17,30 @@ import java.util.List;
 
 public class SantaHatter implements ImageAnalyzer {
 
-    private static final int NUMBER_OF_FRAMES_TO_HOLD_STILL_FOR = 1;
     private final CascadeClassifier detector;
     private Rect[] lastFrameRects = null;
-    private BufferedImage santaHatImage;
     private FaceStatus faceStatus;
     private long smallFaceMovementsSince = -1;
     private boolean isFrameDrawnAroundFace;
+    private Overlay currentOverlay;
+
+    private static class Overlay {
+        private double widthFactor = 1.0;
+        private double heightFactor = 1.0;
+        private double xOffset = 0.0;
+        private double yOffset = 0.0;
+        private BufferedImage image = null;
+
+        private Overlay(BufferedImage image, double widthFactor, double heightFactor, double xOffset, double yOffset) {
+            this.heightFactor = heightFactor;
+            this.image = image;
+            this.widthFactor = widthFactor;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
+    }
+
+    private static Overlay[] overlays = null;
 
     public static enum FaceStatus {
         NO,
@@ -33,13 +50,27 @@ public class SantaHatter implements ImageAnalyzer {
 
     private final List<Listener> listeners = new ArrayList<>();
 
-    public SantaHatter(String faceDetectionConfigurationFilePath, boolean frameDrawnAroundFace) {
-        isFrameDrawnAroundFace = frameDrawnAroundFace;
+    static {
         try {
-            santaHatImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("santa_hat.png"));
+            Overlay overlayAviatorSunglasses = new Overlay(ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("aviator_sunglasses.png")), 1.0, 0.8, 0.0, 0.0);
+            Overlay overlayBigWhiteBeard = new Overlay(ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("whitebeard.png")), 1.0, 1.0, 0.0, 0.6);
+            Overlay overlayMustache = new Overlay(ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("mustasch.png")), 0.6, 0.15, 0.2, 0.65);
+            Overlay overlaySantaHat = new Overlay(ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream("santa_hat.png")), 1.4, 1.0, -0.1, -0.7);
+            overlays = new Overlay[] {
+                    overlayAviatorSunglasses,
+                    overlayBigWhiteBeard,
+                    overlayBigWhiteBeard,
+                    overlayMustache,
+                    overlaySantaHat,
+                    overlaySantaHat,
+                    overlaySantaHat
+            };
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+    public SantaHatter(String faceDetectionConfigurationFilePath, boolean frameDrawnAroundFace) {
+        isFrameDrawnAroundFace = frameDrawnAroundFace;
         if (!new File(faceDetectionConfigurationFilePath).isFile()) {
             throw new IllegalArgumentException("Path to face detection configuration file is invalid");
         }
@@ -64,6 +95,7 @@ public class SantaHatter implements ImageAnalyzer {
                 if (isPreviousFaceBig && (isFaceMovedX || isFaceMovedY)) {
                     faceStatus = FaceStatus.YES_MOVING;
                     smallFaceMovementsSince = System.currentTimeMillis();
+                    currentOverlay = overlays[((int) (Math.random() * overlays.length))];
                 } else {
                     // Only small movement since last analyzed frame
                     faceStatus = FaceStatus.YES_STATIC;
@@ -72,6 +104,7 @@ public class SantaHatter implements ImageAnalyzer {
                 // The last detected face was quite small but the currently detected face is large, so the face is moving away from or towards the camera.
                 faceStatus = FaceStatus.YES_MOVING;
                 smallFaceMovementsSince = System.currentTimeMillis();
+                currentOverlay = overlays[((int) (Math.random() * overlays.length))];
             }
 
             lastFrameRects = rects;
@@ -124,11 +157,11 @@ public class SantaHatter implements ImageAnalyzer {
                 g.drawRect(rect.x, rect.y, rect.width, rect.height);
             }
             AffineTransform transform = new AffineTransform();
-            double sx = 1.0 * (rect.width * 1.4) / santaHatImage.getWidth();
-            double sy = 1.0 * rect.height / santaHatImage.getHeight();
+            double sx = 1.0 * (rect.width * currentOverlay.widthFactor) / currentOverlay.image.getWidth();
+            double sy = 1.0 * (rect.height * currentOverlay.heightFactor) / currentOverlay.image.getHeight();
             transform.scale(sx, sy);
-            transform.translate((rect.x - (.1 * rect.width)) / sx, (rect.y - rect.height + 0.3 * rect.height) / sy);
-            g.drawImage(santaHatImage, transform, null);
+            transform.translate((rect.x + (currentOverlay.xOffset * rect.width)) / sx, (rect.y + (currentOverlay.yOffset * rect.height)) / sy);
+            g.drawImage(currentOverlay.image, transform, null);
             g.dispose();
         }
 
