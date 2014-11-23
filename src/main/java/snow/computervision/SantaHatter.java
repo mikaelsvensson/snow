@@ -23,6 +23,7 @@ public class SantaHatter implements ImageAnalyzer {
     private int historyPos = 0;
     private BufferedImage santaHatImage;
     private FaceStatus faceStatus;
+    private long smallFaceMovementsSince = -1;
 
     public static enum FaceStatus {
         NO,
@@ -62,6 +63,9 @@ public class SantaHatter implements ImageAnalyzer {
                     int avgHeight = histRect.height / 2 + prevHistRect.height / 2;
                     if (1.0 * Math.abs(histRect.x - prevHistRect.x) / avgWidth >= 0.1 || 1.0 * Math.abs(histRect.y - prevHistRect.y) / avgHeight >= 0.1) {
                         faceStatus = FaceStatus.YES_MOVING;
+                        smallFaceMovementsSince = System.currentTimeMillis();
+                    } else {
+                        // Only small movement since last analyzed frame
                     }
                 } else {
                     faceStatus = FaceStatus.YES_MOVING;
@@ -69,6 +73,7 @@ public class SantaHatter implements ImageAnalyzer {
             }
         } else {
             faceStatus = FaceStatus.NO;
+            smallFaceMovementsSince = -1;
         }
     }
 
@@ -126,7 +131,7 @@ public class SantaHatter implements ImageAnalyzer {
             fireStaticDetected();
         }
 
-        firePostProcessed(faceStatus, image);
+        firePostProcessed(faceStatus, image, smallFaceMovementsSince);
     }
 
     private void fireStaticDetected() {
@@ -135,9 +140,9 @@ public class SantaHatter implements ImageAnalyzer {
         }
     }
 
-    private void firePostProcessed(FaceStatus faceStatus, BufferedImage image) {
+    private void firePostProcessed(FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince) {
         for (Listener listener : listeners) {
-            listener.onPostProcessed(faceStatus, image);
+            listener.onPostProcessed(faceStatus, image, smallFaceMovementsSince);
         }
     }
 
@@ -150,6 +155,6 @@ public class SantaHatter implements ImageAnalyzer {
 
         void onStaticFaceDetected();
 
-        void onPostProcessed(FaceStatus faceStatus, BufferedImage image);
+        void onPostProcessed(FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince);
     }
 }

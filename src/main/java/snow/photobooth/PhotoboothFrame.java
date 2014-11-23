@@ -17,8 +17,9 @@ class PhotoboothFrame extends SlimFrame {
         pack();
     }
 
-    public void updateView(BufferedImage image, String... message) {
+    public void updateView(BufferedImage image, double waitProgress, String... message) {
         facePanel.setImage(image);
         facePanel.setMessage(message);
+        facePanel.setWaitProgress(waitProgress);
     }
 }

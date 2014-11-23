@@ -36,6 +36,7 @@ public class PhotoboothApplication implements Runnable {
         SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath"));
         santaHatter.addListener(new SantaHatter.Listener() {
             public long lastUpdate = System.currentTimeMillis();
+            public boolean currentFaceHasBeenSaved;
 
             @Override
             public void onFaceDetected() {
@@ -46,26 +47,37 @@ public class PhotoboothApplication implements Runnable {
             }
 
             @Override
-            public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image) {
+            public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince) {
                 if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    frame.updateView(image, "Hi there.", "Too shy to come", "up to the camera?");
+                    frame.updateView(image, -1, "Hi there.", "Too shy to come", "up to the camera?");
+                    currentFaceHasBeenSaved = false;
                 } else {
-                    if (faceStatus == SantaHatter.FaceStatus.YES_STATIC && System.currentTimeMillis() - lastUpdate > 5000) {
-                        frame.updateView(image, "*click*", "Thank you.");
+                    long timeFaceHasBeenStill = System.currentTimeMillis() - smallFaceMovementsSince;
+                    double waitProgress = 1.0 * timeFaceHasBeenStill / 3000;
+                    if (waitProgress > 1.0) {
+                        // Wait is over. Face has been still for enough time.
+                        frame.updateView(image, -1, "*click*", "Thank you.");
+                        if (!currentFaceHasBeenSaved) {
 
-                        try (
-                                Socket socket = new Socket(Util.getServerHost(), Util.getServerPort());
-                                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
-                        ) {
-                            ImageIO.write(image, "png", out);
-                        } catch (IOException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        } finally {
+                            try (
+                                    Socket socket = new Socket(Util.getServerHost(), Util.getServerPort());
+                                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
+                            ) {
+                                ImageIO.write(image, "png", out);
+                            } catch (IOException e) {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            } finally {
 
+                            }
                         }
-                        lastUpdate = System.currentTimeMillis();
+                        currentFaceHasBeenSaved = true;
                     } else {
-                        frame.updateView(image, "Hold it...");
+                        if (waitProgress < 0.1) {
+                            frame.updateView(image, -1, "Hold your", "head still", "for a moment.");
+                        } else {
+                            frame.updateView(image, waitProgress, "Almost", "there...");
+                        }
+                        currentFaceHasBeenSaved = false;
                     }
                 }
             }

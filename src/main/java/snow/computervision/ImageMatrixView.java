@@ -11,6 +11,7 @@ public class ImageMatrixView extends JPanel {
     private static final Color BLACK_TRANSPARENT = new Color(0, 0, 0, (int) (255 * 0.7));
     private BufferedImage buf;
     private String[] message;
+    private double waitProgress;
 
     public void setImage(BufferedImage image) {
         int height = getHeight();
@@ -25,7 +26,7 @@ public class ImageMatrixView extends JPanel {
             int newImageHeight = (int) (resizeRatio * image.getHeight());
             int newImageWidth = (int) (resizeRatio * image.getWidth());
 
-            g.drawImage(image, (width -newImageWidth)/2, (height -newImageHeight)/2, newImageWidth, newImageHeight, null);
+            g.drawImage(image, (width - newImageWidth) / 2, (height - newImageHeight) / 2, newImageWidth, newImageHeight, null);
             g.dispose();
         } else {
             buf = image;
@@ -36,12 +37,22 @@ public class ImageMatrixView extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
 //        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
         if (buf != null) {
-            paintImage(g);
+            paintImage(g2d);
         }
         if (message != null) {
-            paintMessage((Graphics2D) g);
+            paintMessage(g2d);
         }
+        if (waitProgress >= 0.1) {
+            paintWaitProgressClock(g2d);
+        }
+    }
+
+    private void paintWaitProgressClock(Graphics2D g2d) {
+        int diameter = (int) (0.5 * Math.min(getWidth(), getHeight()));
+        g2d.setColor(WHITE_TRANSPARENT);
+        g2d.fillArc(getWidth() / 2 - diameter / 2, getHeight() / 2 - diameter / 2, diameter, diameter, 90, -(int) (waitProgress * 360));
     }
 
     private void paintMessage(Graphics2D g2d) {
@@ -62,14 +73,13 @@ public class ImageMatrixView extends JPanel {
         for (int i = 0; i < message.length; i++) {
             Rectangle2D bounds = lineBounds[i];
 
-            g2d.fillRect(xyPoints[i].x, xyPoints[i].y - (int) (0.9 * bounds.getHeight()), (int) bounds.getWidth(), (int) bounds.getHeight());
+            g2d.fillRect(xyPoints[i].x, xyPoints[i].y - (int) (0.8 * bounds.getHeight()), (int) bounds.getWidth(), (int) bounds.getHeight());
         }
         g2d.setColor(WHITE_TRANSPARENT);
         for (int i = 0; i < message.length; i++) {
             String line = message[i];
 
             g2d.drawString(line, xyPoints[i].x, xyPoints[i].y);
-
         }
     }
 
@@ -81,4 +91,11 @@ public class ImageMatrixView extends JPanel {
         this.message = message;
     }
 
+    public void setWaitProgress(double waitProgress) {
+        this.waitProgress = waitProgress;
+    }
+
+    public double getWaitProgress() {
+        return waitProgress;
+    }
 }
