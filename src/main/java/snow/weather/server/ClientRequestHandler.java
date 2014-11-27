@@ -20,7 +20,7 @@ class ClientRequestHandler implements Runnable {
         try {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             BufferedImage image = ImageIO.read(in);
-            WeatherController.getInstance().addSceneObject(image);
+            WeatherController.getInstance().addImage(image);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.List;
 
 public class WeatherController {
+    private static final int IMAGE_CACHE_SIZE = 5;
     private int objectCount = 50;
     private static WeatherController instance;
     private Rectangle sceneBounds;
@@ -21,6 +22,7 @@ public class WeatherController {
     // TODO: Move serverThread to snow.weather.WeatherApplication?
     private Thread serverThread;
     private ServerRunnable serverRunnable;
+    private List<BufferedImage> imageCache = new ArrayList<>();
 
     public void changeFallingObjectSlowness(int delta) {
         synchronized (sceneObjects) {
@@ -68,53 +70,9 @@ public class WeatherController {
         serverRunnable = new ServerRunnable();
         serverThread = new Thread(serverRunnable);
         serverThread.start();
-
-/*
-        ComputerVision.getInstance().start();
-
-        final PhotoboothFrame frame = new PhotoboothFrame();
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.setSize(1000, 500);
-        frame.setVisible(true);
-
-        SantaHatter santaHatter = new SantaHatter(System.getProperty("faceDetectionConfigurationFilePath")) {
-
-            @Override
-            public void postProcess(BufferedImage image) {
-                super.postProcess(image);
-            }
-        };
-        santaHatter.addListener(new SantaHatter.Listener() {
-            public long lastUpdate = System.currentTimeMillis();
-
-            @Override
-            public void onFaceDetected() {
-            }
-
-            @Override
-            public void onStaticFaceDetected() {
-            }
-
-            @Override
-            public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image) {
-                if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    frame.updateView(image, "Hi there.", "Too shy to come", "up to the camera?");
-                } else {
-                    if (faceStatus == SantaHatter.FaceStatus.YES_STATIC && System.currentTimeMillis() - lastUpdate > 5000) {
-                        frame.updateView(image, "*click*", "Thank you.");
-                        addSceneObject(image);
-                        lastUpdate = System.currentTimeMillis();
-                    } else {
-                        frame.updateView(image, "Hold it...");
-                    }
-                }
-            }
-        });
-        ComputerVision.getInstance().addImageAnalyser(santaHatter);
-*/
     }
 
-    public void addSceneObject(BufferedImage image) {
+    private void addSceneObject(BufferedImage image) {
         synchronized (sceneObjects) {
             sceneObjects.add(new PhotoSceneObject(image, sceneBounds));
             sortSceneObjectByZ();
@@ -127,8 +85,9 @@ public class WeatherController {
         SceneObject obj;
         if (v < 0.05) {
             obj = new DayBubble(z, sceneBounds);
-//        } else if (v < 0.15) {
-//            obj = new Cloud(300, 300, z, sceneBounds);
+        } else if (v < 0.20 && imageCache.size() > 0 && !isImageInScene()) {
+            BufferedImage image = imageCache.get((int) (Math.random() * imageCache.size()));
+            obj = new PhotoSceneObject(image, sceneBounds);
         } else {
             int snowflakeHeight = 200;
             int snowflakeWidth = 200;
@@ -266,7 +225,7 @@ public class WeatherController {
                             // New file
                             try {
                                 final BufferedImage bufferedImage = ImageIO.read(file);
-                                addSceneObject(bufferedImage);
+                                addImage(bufferedImage);
                                 Thread.yield();
                             } catch (IOException e) {
                                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -287,6 +246,16 @@ public class WeatherController {
         }
     }
 
+    public void addImage(BufferedImage image) {
+        synchronized (imageCache) {
+            while (imageCache.size() > IMAGE_CACHE_SIZE) {
+                imageCache.remove(imageCache.size() - 1);
+            }
+            imageCache.add(0, image);
+        }
+        addSceneObject(image);
+    }
+
     private void addMissingSceneObjects() {
         synchronized (sceneObjects) {
             while (sceneObjects.size() < objectCount) {
@@ -296,6 +265,17 @@ public class WeatherController {
             sortSceneObjectByZ();
         }
         updateSceneObjectsCopy();
+    }
+
+    private boolean isImageInScene() {
+        synchronized (sceneObjects) {
+            for (SceneObject sceneObject : sceneObjects) {
+                if (sceneObject instanceof PhotoSceneObject) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void sortSceneObjectByZ() {
