@@ -17,6 +17,9 @@ import java.util.List;
 
 public class SantaHatter implements ImageAnalyzer {
 
+    private static final double BIG_FACE_FACTOR = 0.2;
+    private static final double SMALL_FACE_MOVEMENT_FACTOR = 0.2;
+
     private final CascadeClassifier detector;
     private Rect[] lastFrameRects = null;
     private FaceStatus faceStatus;
@@ -81,17 +84,17 @@ public class SantaHatter implements ImageAnalyzer {
     public void process(Mat image) {
         Rect[] rects = detectRects(image);
         Rect currentFaceRect = getLargest(rects);
-        boolean isCurrentFaceBig = currentFaceRect != null && (1.0 * currentFaceRect.height / image.height()) > 0.2;
+        boolean isCurrentFaceBig = currentFaceRect != null && (1.0 * currentFaceRect.height / image.height()) > BIG_FACE_FACTOR;
         if (isCurrentFaceBig) {
             fireFaceDetected();
 
             Rect previousFaceRect = getLargest(lastFrameRects);
-            boolean isPreviousFaceBig = previousFaceRect != null && (1.0 * previousFaceRect.height / image.height()) > 0.2;
+            boolean isPreviousFaceBig = previousFaceRect != null && (1.0 * previousFaceRect.height / image.height()) > BIG_FACE_FACTOR;
             if (isPreviousFaceBig) {
                 int avgWidth = currentFaceRect.width / 2 + previousFaceRect.width / 2;
                 int avgHeight = currentFaceRect.height / 2 + previousFaceRect.height / 2;
-                boolean isFaceMovedX = 1.0 * Math.abs(currentFaceRect.x - previousFaceRect.x) / avgWidth >= 0.1;
-                boolean isFaceMovedY = 1.0 * Math.abs(currentFaceRect.y - previousFaceRect.y) / avgHeight >= 0.1;
+                boolean isFaceMovedX = 1.0 * Math.abs(currentFaceRect.x - previousFaceRect.x) / avgWidth >= SMALL_FACE_MOVEMENT_FACTOR;
+                boolean isFaceMovedY = 1.0 * Math.abs(currentFaceRect.y - previousFaceRect.y) / avgHeight >= SMALL_FACE_MOVEMENT_FACTOR;
                 if (isPreviousFaceBig && (isFaceMovedX || isFaceMovedY)) {
                     faceStatus = FaceStatus.YES_MOVING;
                     smallFaceMovementsSince = System.currentTimeMillis();

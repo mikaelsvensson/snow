@@ -15,6 +15,8 @@ import java.net.Socket;
 
 public class PhotoboothApplication implements Runnable {
 
+    private static final int HOLD_TIME = 2000;
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new PhotoboothApplication());
     }
@@ -49,21 +51,23 @@ public class PhotoboothApplication implements Runnable {
             @Override
             public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince) {
                 if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    frame.updateView(image, -1, "Hi there.", "Too shy to come", "up to the camera?");
+                    frame.updateView(image, -1, "Kom närmare!", "Var inte blyg.");
                     currentFaceHasBeenSaved = false;
                 } else {
                     long timeFaceHasBeenStill = System.currentTimeMillis() - smallFaceMovementsSince;
-                    double waitProgress = 1.0 * timeFaceHasBeenStill / 3000;
+                    double waitProgress = 1.0 * timeFaceHasBeenStill / HOLD_TIME;
                     if (waitProgress > 1.0) {
                         // Wait is over. Face has been still for enough time.
-                        frame.updateView(image, -1, "*click*", "Thank you.");
+                        frame.updateView(image, -1, "*KLICK*", "Tack.");
                         if (!currentFaceHasBeenSaved) {
 
                             try (
                                     Socket socket = new Socket(Util.getServerHost(), Util.getServerPort());
                                     ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
                             ) {
+                                frame.updateView(image, -1, "Bilden skickas", "till skärmen");
                                 ImageIO.write(image, "png", out);
+                                frame.updateView(image, -1, "Klart :-)");
                             } catch (IOException e) {
                                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                             } finally {
@@ -73,9 +77,9 @@ public class PhotoboothApplication implements Runnable {
                         currentFaceHasBeenSaved = true;
                     } else {
                         if (waitProgress < 0.1) {
-                            frame.updateView(image, -1, "Hold your", "head still", "for a moment.");
+                            frame.updateView(image, -1, "Håll huvudet", "stilla en", "liten stund.");
                         } else {
-                            frame.updateView(image, waitProgress, "Almost", "there...");
+                            frame.updateView(image, waitProgress, "Nästan", "klart...");
                         }
                         currentFaceHasBeenSaved = false;
                     }
