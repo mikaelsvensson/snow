@@ -6,7 +6,7 @@ import java.awt.*;
 
 public abstract class FallingSceneObject extends SceneObject {
     protected double rotationDirection = Util.random(0.3, 1.0) * (Util.random(0, 1) > 0.5 ? 1 : -1);
-    private static int minimumSecondsForFall = 5;
+    private static int minimumSecondsForFall = 25;
 
     FallingSceneObject(int requestedWidthPixels, int requestedHeightPixels, double z, Rectangle sceneBounds) {
         super(requestedWidthPixels,
