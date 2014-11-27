@@ -5,7 +5,7 @@ import snow.Util;
 import java.awt.*;
 
 public abstract class FallingSceneObject extends SceneObject {
-    private final double rotationDirection = Util.random(0.3, 1.0) * (Util.random(0, 1) > 0.5 ? 1 : -1);
+    protected double rotationDirection = Util.random(0.3, 1.0) * (Util.random(0, 1) > 0.5 ? 1 : -1);
     private static int minimumSecondsForFall = 5;
 
     FallingSceneObject(int requestedWidthPixels, int requestedHeightPixels, double z, Rectangle sceneBounds) {
@@ -26,7 +26,7 @@ public abstract class FallingSceneObject extends SceneObject {
     }
 
     public static void changeSlowness(int delta) {
-        minimumSecondsForFall = Math.max(1, Math.min(20, minimumSecondsForFall + delta));
+        minimumSecondsForFall = Math.max(1, Math.min(50, minimumSecondsForFall + delta));
     }
 
     public static int getSlowness() {
