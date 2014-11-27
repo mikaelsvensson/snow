@@ -6,6 +6,7 @@ import snow.computervision.SantaHatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -16,16 +17,23 @@ import java.net.Socket;
 public class PhotoboothApplication implements Runnable {
 
     private static final int HOLD_TIME = 2000;
+    private final Rectangle startUpWindowBound;
+
+    public PhotoboothApplication(Rectangle startUpWindowBound) {
+        this.startUpWindowBound = startUpWindowBound;
+    }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new PhotoboothApplication());
+        final Rectangle[] configurations = Util.getWindowBounds(args);
+
+        SwingUtilities.invokeLater(new PhotoboothApplication(configurations[0]));
     }
 
     @Override
     public void run() {
         final PhotoboothFrame frame = new PhotoboothFrame();
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.setSize(1000, 500);
+        frame.setBounds(startUpWindowBound);
         frame.setVisible(true);
         final ComputerVision computerVision = ComputerVision.getInstance();
         frame.addWindowListener(new WindowAdapter() {
@@ -66,7 +74,7 @@ public class PhotoboothApplication implements Runnable {
                                     ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
                             ) {
                                 frame.updateView(image, -1, "Bilden skickas", "till skärmen");
-                                ImageIO.write(image, "png", out);
+                                ImageIO.write(image, "jpg", out);
                                 frame.updateView(image, -1, "Klart :-)");
                             } catch (IOException e) {
                                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
