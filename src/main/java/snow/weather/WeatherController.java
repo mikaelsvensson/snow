@@ -125,8 +125,8 @@ public class WeatherController {
     private SceneObject createRandomSceneObject(double z) {
         double v = Math.random();
         SceneObject obj;
-        if (v < 0.1) {
-            obj = new DayBubble(100, 100, z, sceneBounds);
+        if (v < 0.05) {
+            obj = new DayBubble(z, sceneBounds);
 //        } else if (v < 0.15) {
 //            obj = new Cloud(300, 300, z, sceneBounds);
         } else {
