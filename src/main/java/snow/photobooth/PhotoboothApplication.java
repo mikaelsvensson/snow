@@ -1,7 +1,9 @@
 package snow.photobooth;
 
 import snow.Util;
+import snow.computervision.CameraRotator;
 import snow.computervision.ComputerVision;
+import snow.computervision.Rotation;
 import snow.computervision.SantaHatter;
 
 import javax.imageio.ImageIO;
@@ -13,20 +15,29 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class PhotoboothApplication implements Runnable {
 
     private static final int HOLD_TIME = 2000;
     private final Rectangle startUpWindowBound;
+    private final Rotation rotation;
 
-    public PhotoboothApplication(Rectangle startUpWindowBound) {
+    public PhotoboothApplication(Rectangle startUpWindowBound, Rotation rotation) {
         this.startUpWindowBound = startUpWindowBound;
+        this.rotation = rotation;
     }
 
     public static void main(String[] args) {
+        Rotation rotation = null;
+        try {
+            rotation = Rotation.valueOf(args[0].toUpperCase());
+            args = Arrays.copyOfRange(args, 1, args.length);
+        } catch (IllegalArgumentException e) {
+        }
         final Rectangle[] configurations = Util.getWindowBounds(args);
 
-        SwingUtilities.invokeLater(new PhotoboothApplication(configurations[0]));
+        SwingUtilities.invokeLater(new PhotoboothApplication(configurations[0], rotation));
     }
 
     @Override
@@ -94,7 +105,11 @@ public class PhotoboothApplication implements Runnable {
                 }
             }
         });
+        if (rotation != null) {
+            computerVision.addImageAnalyser(new CameraRotator(rotation));
+        }
         computerVision.addImageAnalyser(santaHatter);
         computerVision.start();
     }
+
 }
