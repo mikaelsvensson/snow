@@ -70,7 +70,7 @@ public class PhotoboothApplication implements Runnable {
             @Override
             public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince) {
                 if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    frame.updateView(image, -1, "Kom närmare!", "Var inte blyg.");
+                    frame.updateView(image, -1, "Hej", "", "Kom närmare!");
                     currentFaceHasBeenSaved = false;
                 } else {
                     long timeFaceHasBeenStill = System.currentTimeMillis() - smallFaceMovementsSince;
