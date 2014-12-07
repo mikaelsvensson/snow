@@ -83,7 +83,7 @@ public class WeatherController {
     private SceneObject createRandomSceneObject(double z) {
         double v = Math.random();
         SceneObject obj;
-        if (v < 0.05) {
+        if (v < 0.10) {
             obj = new DayBubble(z, sceneBounds);
         } else if (v < 0.20 && imageCache.size() > 0 && !isImageInScene()) {
             BufferedImage image = imageCache.get((int) (Math.random() * imageCache.size()));
