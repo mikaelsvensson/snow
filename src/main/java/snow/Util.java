@@ -3,6 +3,8 @@ package snow;
 import java.awt.*;
 
 public class Util {
+    public static final Color DARK_CHRISTMAS_RED = new Color(176, 19, 0);
+
     public static double random(double min, double max) {
         return min + Math.random() * (max - min);
     }

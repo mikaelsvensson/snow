@@ -1,14 +1,20 @@
 package snow.computervision;
 
+import snow.Util;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class ImageMatrixView extends JPanel {
-    private static final Font OVERLAY_FONT = new Font("Arial", Font.BOLD, 100);
-    private static final Color WHITE_TRANSPARENT = new Color(255, 255, 255, (int) (255 * 0.7));
-    private static final Color BLACK_TRANSPARENT = new Color(0, 0, 0, (int) (255 * 0.7));
+    private static final Font OVERLAY_FONT = new Font(Font.SERIF, Font.BOLD, 100);
+    private static final Color FOREGROUND_COLOR = new Color(255, 255, 255, (int) (255 * 0.7));
+    private static final Color BACKGROUND_COLOR = new Color(
+            Util.DARK_CHRISTMAS_RED.getRed(),
+            Util.DARK_CHRISTMAS_RED.getGreen(),
+            Util.DARK_CHRISTMAS_RED.getBlue(),
+            (int) (255 * 0.7));
     private BufferedImage buf;
     private String[] message;
     private double waitProgress;
@@ -51,7 +57,7 @@ public class ImageMatrixView extends JPanel {
 
     private void paintWaitProgressClock(Graphics2D g2d) {
         int diameter = (int) (0.5 * Math.min(getWidth(), getHeight()));
-        g2d.setColor(WHITE_TRANSPARENT);
+        g2d.setColor(FOREGROUND_COLOR);
         g2d.fillArc(getWidth() / 2 - diameter / 2, getHeight() / 2 - diameter / 2, diameter, diameter, 90, -(int) (waitProgress * 360));
     }
 
@@ -69,13 +75,13 @@ public class ImageMatrixView extends JPanel {
                     (getWidth() / 2) - (int) (lineBounds[i].getWidth() / 2),
                     (getHeight() / 2) + (metrics.getHeight() / 2) - (message.length * metrics.getHeight() / 2) + (i * metrics.getHeight()));
         }
-        g2d.setColor(BLACK_TRANSPARENT);
+        g2d.setColor(BACKGROUND_COLOR);
         for (int i = 0; i < message.length; i++) {
             Rectangle2D bounds = lineBounds[i];
 
-            g2d.fillRect(xyPoints[i].x, xyPoints[i].y - (int) (0.8 * bounds.getHeight()), (int) bounds.getWidth(), (int) bounds.getHeight());
+            g2d.fillRect(xyPoints[i].x - (int) (0.04 * bounds.getWidth()), xyPoints[i].y - (int) (0.75 * bounds.getHeight()), (int) (1.08 * bounds.getWidth()), (int) bounds.getHeight());
         }
-        g2d.setColor(WHITE_TRANSPARENT);
+        g2d.setColor(FOREGROUND_COLOR);
         for (int i = 0; i < message.length; i++) {
             String line = message[i];
 

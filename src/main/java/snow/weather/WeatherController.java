@@ -85,7 +85,7 @@ public class WeatherController {
         SceneObject obj;
         if (v < 0.10) {
             obj = new DayBubble(z, sceneBounds);
-        } else if (v < 0.20 && imageCache.size() > 0 && !isImageInScene()) {
+        } else if (v < 0.30 && imageCache.size() > 0 && getImageCount() < 3) {
             BufferedImage image = imageCache.get((int) (Math.random() * imageCache.size()));
             obj = new PhotoSceneObject(image, sceneBounds);
         } else {
@@ -267,15 +267,16 @@ public class WeatherController {
         updateSceneObjectsCopy();
     }
 
-    private boolean isImageInScene() {
+    private int getImageCount() {
         synchronized (sceneObjects) {
+            int count = 0;
             for (SceneObject sceneObject : sceneObjects) {
                 if (sceneObject instanceof PhotoSceneObject) {
-                    return true;
+                    count++;
                 }
             }
+            return count;
         }
-        return false;
     }
 
     private void sortSceneObjectByZ() {
