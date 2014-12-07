@@ -9,12 +9,16 @@ import java.awt.image.BufferedImage;
 
 public class ImageMatrixView extends JPanel {
     private static final Font OVERLAY_FONT = new Font(Font.SERIF, Font.BOLD, 100);
-    private static final Color FOREGROUND_COLOR = new Color(255, 255, 255, (int) (255 * 0.7));
+    private static final double OVERLAY_OPACTIY = 0.7;
+    private static final Color FOREGROUND_COLOR = new Color(255, 255, 255, (int) (255 * OVERLAY_OPACTIY));
     private static final Color BACKGROUND_COLOR = new Color(
             Util.DARK_CHRISTMAS_RED.getRed(),
             Util.DARK_CHRISTMAS_RED.getGreen(),
             Util.DARK_CHRISTMAS_RED.getBlue(),
-            (int) (255 * 0.7));
+            (int) (255 * OVERLAY_OPACTIY));
+    private static final double ORIGO_Y = 0.75;
+    private static final double ORIGO_X = 0.5;
+    private static final double PROGRESS_CIRCLE_DIAMETER = 0.4;
     private BufferedImage buf;
     private String[] message;
     private double waitProgress;
@@ -42,7 +46,6 @@ public class ImageMatrixView extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         if (buf != null) {
             paintImage(g2d);
@@ -56,9 +59,9 @@ public class ImageMatrixView extends JPanel {
     }
 
     private void paintWaitProgressClock(Graphics2D g2d) {
-        int diameter = (int) (0.5 * Math.min(getWidth(), getHeight()));
+        int diameter = (int) (PROGRESS_CIRCLE_DIAMETER * Math.min(getWidth(), getHeight()));
         g2d.setColor(FOREGROUND_COLOR);
-        g2d.fillArc(getWidth() / 2 - diameter / 2, getHeight() / 2 - diameter / 2, diameter, diameter, 90, -(int) (waitProgress * 360));
+        g2d.fillArc((int) (ORIGO_X * getWidth()) - diameter / 2, (int) (ORIGO_Y * getHeight()) - diameter / 2, diameter, diameter, 90, -(int) (waitProgress * 360));
     }
 
     private void paintMessage(Graphics2D g2d) {
@@ -72,14 +75,14 @@ public class ImageMatrixView extends JPanel {
             String line = message[i];
             lineBounds[i] = metrics.getStringBounds(line, g2d);
             xyPoints[i] = new Point(
-                    (getWidth() / 2) - (int) (lineBounds[i].getWidth() / 2),
-                    (getHeight() / 2) + (metrics.getHeight() / 2) - (message.length * metrics.getHeight() / 2) + (i * metrics.getHeight()));
+                    (int) (ORIGO_X * getWidth()) - (int) (lineBounds[i].getWidth() / 2),
+                    (int) (ORIGO_Y * getHeight()) + (metrics.getHeight() / 2) - (message.length * metrics.getHeight() / 2) + (i * metrics.getHeight()));
         }
         g2d.setColor(BACKGROUND_COLOR);
         for (int i = 0; i < message.length; i++) {
             Rectangle2D bounds = lineBounds[i];
 
-            g2d.fillRect(xyPoints[i].x - (int) (0.04 * bounds.getWidth()), xyPoints[i].y - (int) (0.75 * bounds.getHeight()), (int) (1.08 * bounds.getWidth()), (int) bounds.getHeight());
+            g2d.fillRect(xyPoints[i].x - (int) (0.04 * bounds.getWidth()), xyPoints[i].y - (int) (ORIGO_Y * bounds.getHeight()), (int) (1.08 * bounds.getWidth()), (int) bounds.getHeight());
         }
         g2d.setColor(FOREGROUND_COLOR);
         for (int i = 0; i < message.length; i++) {
