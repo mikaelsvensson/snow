@@ -70,7 +70,7 @@ public class PhotoboothApplication implements Runnable {
             @Override
             public void onPostProcessed(SantaHatter.FaceStatus faceStatus, BufferedImage image, long smallFaceMovementsSince) {
                 if (faceStatus == SantaHatter.FaceStatus.NO) {
-                    frame.updateView(image, -1, "Hej", "", "Kom närmare!");
+                    frame.updateView(image, -1, "FOTOAUTOMAT", "", "Kom närmare!");
                     currentFaceHasBeenSaved = false;
                 } else {
                     long timeFaceHasBeenStill = System.currentTimeMillis() - smallFaceMovementsSince;
@@ -79,16 +79,15 @@ public class PhotoboothApplication implements Runnable {
                         // Wait is over. Face has been still for enough time.
                         frame.updateView(image, -1, "*KLICK*", "Tack.");
                         if (!currentFaceHasBeenSaved) {
-
+                            frame.updateView(image, -1, "Bilden skickas", "till skärmen");
                             try (
                                     Socket socket = new Socket(Util.getServerHost(), Util.getServerPort());
                                     ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
                             ) {
-                                frame.updateView(image, -1, "Bilden skickas", "till skärmen");
                                 ImageIO.write(image, "jpg", out);
                                 frame.updateView(image, -1, "Klart :-)");
                             } catch (IOException e) {
-                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                e.printStackTrace();
                             } finally {
 
                             }
