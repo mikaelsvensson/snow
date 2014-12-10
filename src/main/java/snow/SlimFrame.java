@@ -1,5 +1,6 @@
 package snow;
 
+import snow.weather.SceneObject;
 import snow.weather.WeatherController;
 
 import javax.swing.*;
@@ -134,7 +135,10 @@ public class SlimFrame extends JFrame {
 
         drawKeyValueString(g2d, y += 20, "Fönster", getName());
         drawKeyValueString(g2d, y += 20, "FPS", String.valueOf(fps));
-        drawKeyValueString(g2d, y += 20, "Antal objekt", String.valueOf(WeatherController.getInstance().getSceneObjects().length));
+        SceneObject[] sceneObjects = WeatherController.getInstance().getSceneObjects();
+        if (sceneObjects != null) {
+            drawKeyValueString(g2d, y += 20, "Antal objekt", String.valueOf(sceneObjects.length));
+        }
 
         for (KeyStroke key : getRootPane().getInputMap().keys()) {
             drawKeyValueString(g2d, y += 20, KeyEvent.getKeyText(key.getKeyCode()), getRootPane().getActionMap().get(getRootPane().getInputMap().get(key)).getValue(Action.NAME).toString());
