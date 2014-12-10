@@ -8,6 +8,8 @@ import org.opencv.highgui.VideoCapture;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -28,6 +30,7 @@ public class ComputerVision {
     private Thread imageProviderThread;
     private ImageProvider imageProvider;
     private final List<Listener> listeners = new ArrayList<>();
+    private Timer timer;
 
     private ComputerVision() {
     }
@@ -55,6 +58,22 @@ public class ComputerVision {
         imageProviderThread = new Thread(getImageProvider());
 //        imageProviderThread.setPriority(Thread.MIN_PRIORITY);
         imageProviderThread.start();
+
+        try {
+            final Robot robot = new Robot();
+            timer = new javax.swing.Timer(10000, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Point point = MouseInfo.getPointerInfo().getLocation();
+                    robot.waitForIdle();
+                    robot.mouseMove(point.x + 1, point.y);
+                    robot.mouseMove(point.x, point.y);
+                }
+            });
+            timer.start();
+        } catch (AWTException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     private ImageProvider getImageProvider() {
@@ -99,6 +118,9 @@ public class ComputerVision {
             } catch (InterruptedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
+        }
+        if (timer != null) {
+            timer.stop();
         }
     }
 
