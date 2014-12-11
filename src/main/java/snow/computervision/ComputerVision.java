@@ -26,6 +26,8 @@ public class ComputerVision {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
+    protected static final int TEN_SECONDS = 10000;
+
     private static ComputerVision instance = null;
     private Thread imageProviderThread;
     private ImageProvider imageProvider;
@@ -61,11 +63,10 @@ public class ComputerVision {
 
         try {
             final Robot robot = new Robot();
-            timer = new javax.swing.Timer(10000, new AbstractAction() {
+            timer = new javax.swing.Timer(TEN_SECONDS, new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Point point = MouseInfo.getPointerInfo().getLocation();
-                    robot.waitForIdle();
                     robot.mouseMove(point.x + 1, point.y);
                     robot.mouseMove(point.x, point.y);
                 }
